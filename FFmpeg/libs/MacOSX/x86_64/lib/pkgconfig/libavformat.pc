@@ -1,0 +1,14 @@
+prefix=../output/MacOSX/x86_64
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: libavformat
+Description: FFmpeg container format library
+Version: 54.61.103
+Requires: libavcodec = 54.90.100
+Requires.private: 
+Conflicts:
+Libs: -L${libdir} -lavformat -lm -framework CoreFoundation -framework VideoDecodeAcceleration -framework QuartzCore -lbz2 -lz
+Libs.private: 
+Cflags: -I${includedir}
