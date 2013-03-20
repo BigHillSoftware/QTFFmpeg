@@ -14,7 +14,7 @@
 
 #pragma mark - Stream opening and closing
 
-- (BOOL)openStream:(NSString *)streamName error:(NSError **)error;
+- (BOOL)openStream:(NSError **)error;
 
 - (BOOL)closeStream:(NSError **)error;
 
@@ -27,7 +27,5 @@
 
 - (BOOL)streamAudioFrame:(QTSampleBuffer *)sampleBuffer
                    error:(NSError **)error;
-
-@property (nonatomic, strong) NSString *streamName;
 
 @end

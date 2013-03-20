@@ -10,14 +10,10 @@
 #import "QTFFAVCapture.h"
 #import "QTFFAVStreamer.h"
 #import "QTFFAppLog.h"
+#import "NSView+BackgroundColor.h"
+#import "QTFFAVConfig.h"
 
-#define INCLUDE_INTERNAL_VIDEO_CAMERA       YES
-#define VIDEO_FRAME_WIDTH                   384.0
-#define VIDEO_FRAME_HEIGHT                  216.0
-#define VIDEO_FRAME_SIZE                    CGSizeMake(VIDEO_FRAME_WIDTH, VIDEO_FRAME_HEIGHT)
-#define VIDEO_FRAMES_PER_SECOND             24
-#define VIDEO_FRAME_PIXEL_FORMAT            kCVPixelFormatType_422YpCbCr8
-#define VIDEO_DROP_LATE_FRAMES              YES
+#define CODE_EXIT                           1000
 
 
 @interface QTFFAVViewController ()
@@ -35,6 +31,7 @@
     BOOL _isCapturingAudio;
     BOOL _isStreamingVideo;
     BOOL _isStreamingAudio;
+    BOOL _isStreaming;
 }
 
 @end
@@ -47,7 +44,9 @@
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
+    
+    if (self)
+    {
         // Initialization code here.
     }
     
@@ -60,14 +59,27 @@
     _isCapturingAudio = NO;
     _isStreamingVideo = NO;
     _isStreamingAudio = NO;
+    _isStreaming = NO;
+    
+    // create the capture object
+    _avCapture = [[QTFFAVCapture alloc] init];
+    
+    // create the streamer
+    _avStreamer = [[QTFFAVStreamer alloc] init];
+    
+    // UI
+    [_audioCaptureView setBGColor:[NSColor blackColor]];
 }
 
 #pragma mark - Popup display
 
 - (BOOL)displayVideoPopup;
 {
+    // get shared app state
+    QTFFAVConfig *config = [QTFFAVConfig sharedConfig];
+    
     // get the devices
-    _availableVideoCaptureDevices = [QTFFAVCapture availableVideoCaptureDevices:INCLUDE_INTERNAL_VIDEO_CAMERA];
+    _availableVideoCaptureDevices = [QTFFAVCapture availableVideoCaptureDevices:config.videoCaptureIncludeInternalCamera];
     
     if ([_availableVideoCaptureDevices count] == 0)
     {
@@ -79,12 +91,10 @@
         [alert setInformativeText:@"Unable to detect any video capture devices attached to your computer. Please exit, connect a video capture device, and try again."];
         [alert addButtonWithTitle:@"Exit"];
         
-        [self.delegate showAlert:alert
-                     modalWindow:self.view.window
-                   modalDelegate:self
-                     endSelector:@selector(alertDidEnd:returnCode:contextInfo:)
-                     contextInfo:nil
-                 restoreIfPaused:YES];
+        [alert beginSheetModalForWindow:self.view.window
+                          modalDelegate:self
+                         didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
+                            contextInfo:nil];
         
         return NO;
     }
@@ -96,7 +106,7 @@
         [_availableVideoCaptureDevicesPopUpButton removeAllItems];
         
         // get the default device, find its index for selection
-        QTCaptureDevice *device = [QTFFAVCapture defaultVideoCaptureDevice:INCLUDE_INTERNAL_VIDEO_CAMERA];
+        QTCaptureDevice *device = [QTFFAVCapture defaultVideoCaptureDevice:config.videoCaptureIncludeInternalCamera];
         NSInteger index = [_availableVideoCaptureDevices indexOfObject:device];
         
         if (index == NSNotFound)
@@ -128,6 +138,9 @@
         _lastSelectedVideoCaptureDeviceIndex = index;
         [_availableVideoCaptureDevicesPopUpButton selectItemAtIndex:index];
         
+        // update the format description
+        [self displayVideoFormatText];
+        
         return YES;
     }
 }
@@ -147,12 +160,10 @@
         [alert setInformativeText:@"Unable to detect any audio capture devices attached to your computer. Please exit, connect an audio capture device, and try again."];
         [alert addButtonWithTitle:@"Exit"];
         
-        [self.delegate showAlert:alert
-                     modalWindow:self.view.window
-                   modalDelegate:self
-                     endSelector:@selector(alertDidEnd:returnCode:contextInfo:)
-                     contextInfo:nil
-                 restoreIfPaused:YES];
+        [alert beginSheetModalForWindow:self.view.window
+                          modalDelegate:self
+                         didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
+                            contextInfo:nil];
         
         return NO;
     }
@@ -196,9 +207,57 @@
         _lastSelectedAudioCaptureDeviceIndex = index;
         [_availableAudioCaptureDevicesPopUpButton selectItemAtIndex:index];
         
+        // update the format description
+        [self displayAudioFormatText];
+        
         return YES;
     }
 }
+
+- (void)displayVideoFormatText;
+{
+    NSString *descriptionText = @"";
+    
+    QTCaptureDevice *device = [_availableVideoCaptureDevices objectAtIndex:[_availableVideoCaptureDevicesPopUpButton indexOfSelectedItem]];
+    
+    NSArray *formatDescriptions = [device formatDescriptions];
+    BOOL hasPrevious = NO;
+    for (QTFormatDescription *description in formatDescriptions)
+    {
+        if (hasPrevious)
+        {
+            descriptionText = [descriptionText stringByAppendingString:@"\n"];
+        }
+        
+        descriptionText = [descriptionText stringByAppendingFormat:@"∙ %@", [description localizedFormatSummary]];
+        hasPrevious = YES;
+    }
+    
+    _videoFormatTextField.stringValue = descriptionText;
+}
+
+- (void)displayAudioFormatText;
+{
+    NSString *descriptionText = @"";
+    
+    QTCaptureDevice *device = [_availableAudioCaptureDevices objectAtIndex:[_availableAudioCaptureDevicesPopUpButton indexOfSelectedItem]];
+    
+    NSArray *formatDescriptions = [device formatDescriptions];
+    BOOL hasPrevious = NO;
+    for (QTFormatDescription *description in formatDescriptions)
+    {
+        if (hasPrevious)
+        {
+            descriptionText = [descriptionText stringByAppendingString:@"\n"];
+        }
+        
+        descriptionText = [descriptionText stringByAppendingFormat:@"∙ %@", [description localizedFormatSummary]];
+        hasPrevious = YES;
+    }
+    
+    _audioFormatTextField.stringValue = descriptionText;
+}
+
 
 #pragma mark - Processing control
 
@@ -217,15 +276,32 @@
                 if ([self startAudioCapture])
                 {
                     // enable the start test button
-                    [_startStreamingButton setEnabled:YES];
+                    [_streamingButton setEnabled:YES];
                 }
             }
         }
     }
-    
 }
 
-#pragma mark - Video
+- (void)stopProcessing;
+{
+    if (_isStreaming)
+    {
+        [self stopStreaming];
+    }
+    
+    if (_isCapturingVideo)
+    {
+        [self stopVideoCapture];
+    }
+    
+    if (_isCapturingAudio)
+    {
+        [self stopAudioCapture];
+    }
+}
+
+#pragma mark - Video capture
 
 - (BOOL)startVideoCapture;
 {
@@ -240,10 +316,6 @@
         
         // start the video capture session
         QTCaptureSession *captureSession = [_avCapture startVideoCaptureWithDevice:device
-                                                                   pixelFormatType:VIDEO_FRAME_PIXEL_FORMAT
-                                                                         frameSize:VIDEO_FRAME_SIZE
-                                                                         frameRate:(1.0/VIDEO_FRAMES_PER_SECOND)
-                                                               dropLateVideoFrames:VIDEO_DROP_LATE_FRAMES
                                                                           delegate:self
                                                                              error:&error];
         
@@ -259,7 +331,20 @@
         }
         else
         {
-            QTFFAppLog(@"Video capture starting failed with error: %@", [error localizedDescription]);
+            NSString *message = [NSString stringWithFormat:@"Video capture starting failed with error: %@", [error localizedDescription]];
+            QTFFAppLog(@"%@", message);
+            
+            NSAlert *alert = [[NSAlert alloc] init];
+            [alert setAlertStyle:NSWarningAlertStyle];
+            [alert setMessageText:@"Video Capture Failed"];
+            [alert setInformativeText:message];
+            [alert addButtonWithTitle:@"Exit"];
+            
+            [alert beginSheetModalForWindow:self.view.window
+                              modalDelegate:self
+                             didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
+                                contextInfo:nil];
+            
             _isCapturingVideo = NO;
             return NO;
         }
@@ -287,29 +372,20 @@
     [self startVideoCapture];
 }
 
-- (void)publishVideo;
-{
-    if ([self startVideoStreaming])
-    {
-        if ([self startAudioStreaming])
-        {
-        }
-    }
-}
+#pragma mark - Video streaming
 
-- (BOOL)startVideoStreamingToURL:(NSString *)URLString;
+- (BOOL)startVideoStreaming;
 {
     if (! _isStreamingVideo)
     {
-        // construct the stream name
-        NSString *URI = [_provisionedStream.archiveURI stringByReplacingOccurrencesOfString:@"archive" withString:@"live"];
-        NSString *streamName = [NSString stringWithFormat:@"%@/%@/%@", URI, _provisionedStream.streamName, _provisionedStream.filename];
+        // get the config
+        QTFFAVConfig *config = [QTFFAVConfig sharedConfig];
         
         // start the stream
-        QTFFAppLog(@"Starting video streaming to URL: %@", streamName);
+        QTFFAppLog(@"Starting video streaming to URL: %@", config.streamOutputStreamName);
         
         NSError *error = nil;
-        BOOL success = [_avStreamer openStream:streamName error:&error];
+        BOOL success = [_avStreamer openStream:&error];
         
         if (success)
         {
@@ -335,9 +411,9 @@
         NSError *error = nil;
         
         BOOL success = [_avStreamer streamVideoFrame:videoFrame
-                                       presentationTime:0
-                                             decodeTime:0
-                                                  error:&error];
+                                    presentationTime:0
+                                          decodeTime:0
+                                               error:&error];
         
         if (success)
         {
@@ -374,7 +450,7 @@
     return YES;
 }
 
-#pragma mark - Audio
+#pragma mark - Audio capture
 
 - (BOOL)startAudioCapture;
 {
@@ -400,7 +476,22 @@
         }
         else
         {
-            QTFFAppLog(@"Audio capture starting failed with error: %@", [error localizedDescription]);
+            NSString *message = [NSString stringWithFormat:@"Audio capture starting failed with error: %@", [error localizedDescription]];
+            QTFFAppLog(@"%@", message);
+            
+            NSAlert *alert = [[NSAlert alloc] init];
+            [alert setAlertStyle:NSWarningAlertStyle];
+            [alert setMessageText:@"Audio Capture Failed"];
+            [alert setInformativeText:message];
+            [alert addButtonWithTitle:@"Exit"];
+            
+            [alert beginSheetModalForWindow:self.view.window
+                              modalDelegate:self
+                             didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
+                                contextInfo:nil];
+            
+            QTFFAppLog(@"%@", message);
+            
             _isCapturingAudio = NO;
             return NO;
         }
@@ -428,11 +519,16 @@
     [self startAudioCapture];
 }
 
+#pragma mark - Audio Streaming
+
 - (BOOL)startAudioStreaming;
 {
     if (! _isStreamingAudio)
     {
-        QTFFAppLog(@"Starting audio streaming to URL: %@", _avStreamer.streamName);
+        // get the config
+        QTFFAVConfig *config = [QTFFAVConfig sharedConfig];
+
+        QTFFAppLog(@"Starting audio streaming to URL: %@", config.streamOutputStreamName);
         
         _isStreamingAudio = YES;
         
@@ -464,7 +560,6 @@
     }
 }
 
-
 - (BOOL)stopAudioStreaming;
 {
     if (_isStreamingAudio)
@@ -488,6 +583,45 @@
     }
     
     return YES;
+}
+
+#pragma mark - Streaming
+
+- (void)startStreaming;
+{
+    if (! _isStreaming)
+    {
+        if ([self startVideoStreaming])
+        {
+            if ([self startAudioStreaming])
+            {
+                // set UI state
+                [_availableVideoCaptureDevicesPopUpButton setEnabled:NO];
+                [_availableAudioCaptureDevicesPopUpButton setEnabled:NO];
+                _streamingButton.title = @"Stop Streaming";
+                
+                // set streaming state
+                _isStreaming = YES;
+            }
+        }
+    }
+}
+
+- (void)stopStreaming;
+{
+    if (_isStreaming)
+    {
+        [self stopVideoStreaming];
+        [self stopAudioStreaming];
+        
+        // set UI state
+        [_availableVideoCaptureDevicesPopUpButton setEnabled:YES];
+        [_availableAudioCaptureDevicesPopUpButton setEnabled:YES];
+        _streamingButton.title = @"Start Streaming";
+        
+        // set streaming state
+        _isStreaming = NO;
+    }
 }
 
 #pragma mark - QTCaptureDecompressedaAudioOutputDelegate Methods
@@ -515,6 +649,74 @@
     if (_isStreamingVideo)
     {
         [self streamVideoFrame:videoFrame];
+    }
+}
+
+#pragma mark - NSAlert delegate methods
+
+- (void)alertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo;
+{
+    QTFFAppLog(@"Alert return code: %ld", returnCode);
+    
+    switch (returnCode)
+    {
+        case CODE_EXIT:
+            QTFFAppLog(@"Terminating app.");
+            [[NSApplication sharedApplication] terminate:self];
+            break;
+            
+        default:
+            break;
+    }
+}
+
+#pragma mark - Actions
+
+- (IBAction)availableVideoCaptureDevicesPopupButtonItemSelected:(id)sender;
+{
+    QTFFAppLog(@"Video capture device selected: %@", _availableVideoCaptureDevicesPopUpButton.title);
+    
+    NSInteger indexOfSelectedItem = _availableVideoCaptureDevicesPopUpButton.indexOfSelectedItem;
+    
+    if (indexOfSelectedItem != _lastSelectedVideoCaptureDeviceIndex)
+    {
+        // load restart video
+        [self performSelectorOnMainThread:@selector(restartVideoCapture) withObject:nil waitUntilDone:NO];
+    }
+    
+    _lastSelectedVideoCaptureDeviceIndex = indexOfSelectedItem;
+    
+    // update the format description
+    [self displayVideoFormatText];
+}
+
+- (IBAction)availableAudioCaptureDevicesPopupButtonItemSelected:(id)sender;
+{
+    QTFFAppLog(@"Audio capture device selected: %@", _availableAudioCaptureDevicesPopUpButton.title);
+    
+    NSInteger indexOfSelectedItem = _availableAudioCaptureDevicesPopUpButton.indexOfSelectedItem;
+    
+    if (indexOfSelectedItem != _lastSelectedAudioCaptureDeviceIndex)
+    {
+        // load restart video
+        //[self performSelectorOnMainThread:@selector(restartAudioCapture) withObject:nil waitUntilDone:NO];
+    }
+    
+    _lastSelectedAudioCaptureDeviceIndex = indexOfSelectedItem;
+    
+    // update the format description
+    [self displayAudioFormatText];
+}
+
+- (IBAction)streamingButtonSelected:(id)sender;
+{
+    if (_isStreaming)
+    {
+        [self stopStreaming];
+    }
+    else
+    {
+        [self startStreaming];
     }
 }
 

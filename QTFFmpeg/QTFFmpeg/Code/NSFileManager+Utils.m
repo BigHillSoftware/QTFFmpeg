@@ -55,23 +55,21 @@ NSString * const DirectoryLocationDomain = @"DirectoryLocationDomain";
 	{
 		if (errorOut)
 		{
-			NSDictionary *userInfo =
-            [NSDictionary dictionaryWithObjectsAndKeys:
-             NSLocalizedStringFromTable(
-                                        @"No path found for directory in domain.",
-                                        @"Errors",
-                                        nil),
-             NSLocalizedDescriptionKey,
-             [NSNumber numberWithInteger:searchPathDirectory],
-             @"NSSearchPathDirectory",
-             [NSNumber numberWithInteger:domainMask],
-             @"NSSearchPathDomainMask",
-             nil];
-			*errorOut =
-            [NSError
-             errorWithDomain:DirectoryLocationDomain
-             code:DirectoryLocationErrorNoPathFound
-             userInfo:userInfo];
+			NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                      NSLocalizedStringFromTable(
+                                                                 @"No path found for directory in domain.",
+                                                                 @"Errors",
+                                                                 nil),
+                                      NSLocalizedDescriptionKey,
+                                      [NSNumber numberWithInteger:searchPathDirectory],
+                                      @"NSSearchPathDirectory",
+                                      [NSNumber numberWithInteger:domainMask],
+                                      @"NSSearchPathDomainMask",
+                                      nil];
+            
+			*errorOut = [NSError errorWithDomain:DirectoryLocationDomain
+                                            code:DirectoryLocationErrorNoPathFound
+                                        userInfo:userInfo];
 		}
         
 		return nil;
@@ -87,20 +85,19 @@ NSString * const DirectoryLocationDomain = @"DirectoryLocationDomain";
 	//
 	if (appendComponent)
 	{
-		resolvedPath = [resolvedPath
-                        stringByAppendingPathComponent:appendComponent];
+		resolvedPath = [resolvedPath stringByAppendingPathComponent:appendComponent];
 	}
 	
 	//
 	// Create the path if it doesn't exist
 	//
 	NSError *error = nil;
-	BOOL success = [self
-                    createDirectoryAtPath:resolvedPath
-                    withIntermediateDirectories:YES
-                    attributes:nil
-                    error:&error];
-	if (!success)
+	BOOL success = [self createDirectoryAtPath:resolvedPath
+                   withIntermediateDirectories:YES
+                                    attributes:nil
+                                         error:&error];
+    
+	if (! success)
 	{
 		if (errorOut)
 		{
@@ -130,18 +127,32 @@ NSString * const DirectoryLocationDomain = @"DirectoryLocationDomain";
 	NSString *executableName =
     [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleExecutable"];
 	NSError *error;
-	NSString *result =
-    [self
-     findOrCreateDirectory:NSApplicationSupportDirectory
-     inDomain:NSUserDomainMask
-     appendPathComponent:executableName
-     error:&error];
+	NSString *result = [self findOrCreateDirectory:NSApplicationSupportDirectory
+                                          inDomain:NSUserDomainMask
+                               appendPathComponent:executableName
+                                             error:&error];
     
-	if (!result)
+	if (! result)
 	{
 		NSLog(@"Unable to find or create application support directory:\n%@", error);
 	}
 	return result;
 }
+
+- (NSString *)desktopDirectory
+{
+	NSError *error;
+	NSString *result = [self findOrCreateDirectory:NSDesktopDirectory
+                                          inDomain:NSUserDomainMask
+                               appendPathComponent:nil
+                                             error:&error];
+    
+	if (! result)
+	{
+		NSLog(@"Unable to find the user's desktop directory:\n%@", error);
+	}
+	return result;
+}
+
 
 @end

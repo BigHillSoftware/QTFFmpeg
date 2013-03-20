@@ -7,6 +7,7 @@
 //
 
 #import "QTFFAVCapture.h"
+#import "QTFFAVConfig.h"
 
 
 static NSString * const kBuiltInVideoCamera = @"FaceTime HD Camera (Built-in)";
@@ -84,16 +85,6 @@ static NSString * const kBuiltInVideoCamera = @"FaceTime HD Camera (Built-in)";
             // create the output device
             _audioCaptureOutput = [[QTCaptureDecompressedAudioOutput alloc] init];
             _audioCaptureOutput.delegate = delegate;
-            
-            //            NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-            //                                        [NSNumber numberWithDouble:frameSize.width], (id)kCVPixelBufferWidthKey,
-            //                                        [NSNumber numberWithDouble:frameSize.height], (id)kCVPixelBufferHeightKey,
-            //                                        [NSNumber numberWithUnsignedInt:pixelFormatType], (id)kCVPixelBufferPixelFormatTypeKey,
-            //                                        nil];
-            
-            //            [_audioCaptureOutput setPixelBufferAttributes:attributes];
-            //            [_videoCaptureOutput setAutomaticallyDropsLateVideoFrames:dropLateVideoFrames];
-            //            [_videoCaptureOutput setMinimumVideoFrameInterval:frameRate];
             
             error = nil;
             success = [_audioCaptureSession addOutput:_audioCaptureOutput error:error];
@@ -195,10 +186,6 @@ static NSString * const kBuiltInVideoCamera = @"FaceTime HD Camera (Built-in)";
 }
 
 - (QTCaptureSession *)startVideoCaptureWithDevice:(QTCaptureDevice *)device
-                                  pixelFormatType:(uint)pixelFormatType
-                                        frameSize:(CGSize)frameSize
-                                        frameRate:(NSTimeInterval)frameRate
-                              dropLateVideoFrames:(BOOL)dropLateVideoFrames
                                          delegate:(id)delegate
                                             error:(NSError **)error;
 {
@@ -223,17 +210,31 @@ static NSString * const kBuiltInVideoCamera = @"FaceTime HD Camera (Built-in)";
             _videoCaptureOutput = [[QTCaptureDecompressedVideoOutput alloc] init];
             _videoCaptureOutput.delegate = delegate;
             
-            NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                                        [NSNumber numberWithDouble:frameSize.width], (id)kCVPixelBufferWidthKey,
-                                        [NSNumber numberWithDouble:frameSize.height], (id)kCVPixelBufferHeightKey,
-                                        [NSNumber numberWithUnsignedInt:pixelFormatType], (id)kCVPixelBufferPixelFormatTypeKey,
-                                        nil];
+            // get shared app state
+            QTFFAVConfig *config = [QTFFAVConfig sharedConfig];
+            
+            NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+            
+            if (config.videoCaptureSetPixelBufferSize)
+            {
+                [attributes setValue:[NSNumber numberWithDouble:config.videoCapturePixelBufferWidth]
+                              forKey:(id)kCVPixelBufferWidthKey];
+                
+                [attributes setValue:[NSNumber numberWithDouble:config.videoCapturePixelBufferHeight]
+                              forKey:(id)kCVPixelBufferHeightKey];
+            }
+            
+            if (config.videoCaptureSetPixelBufferFormatType)
+            {
+                [attributes setValue:[NSNumber numberWithUnsignedLong:config.videoCapturePixelBufferFormatType]
+                              forKey:(id)kCVPixelBufferPixelFormatTypeKey];
+            }
             
             [_videoCaptureOutput setPixelBufferAttributes:attributes];
-            [_videoCaptureOutput setAutomaticallyDropsLateVideoFrames:dropLateVideoFrames];
-            [_videoCaptureOutput setMinimumVideoFrameInterval:frameRate];
             
-            error = nil;
+            [_videoCaptureOutput setAutomaticallyDropsLateVideoFrames:config.videoCaptureDropLateFrames];
+            [_videoCaptureOutput setMinimumVideoFrameInterval:config.videoCaptureFrameRate];
+            
             success = [_videoCaptureSession addOutput:_videoCaptureOutput error:error];
             
             if (success)

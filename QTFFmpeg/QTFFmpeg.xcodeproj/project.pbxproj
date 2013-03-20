@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4257386016F8F7CD00CEE303 /* QTFFAVConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4257385F16F8F7CD00CEE303 /* QTFFAVConfig.m */; };
 		426CA03A16F24F1E0070B627 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 426CA03916F24F1E0070B627 /* Cocoa.framework */; };
 		426CA04416F24F1E0070B627 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 426CA04216F24F1E0070B627 /* InfoPlist.strings */; };
 		426CA04616F24F1E0070B627 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 426CA04516F24F1E0070B627 /* main.m */; };
@@ -19,6 +20,10 @@
 		426CA06416F24F1F0070B627 /* QTFFmpegTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 426CA06316F24F1F0070B627 /* QTFFmpegTests.m */; };
 		427275E116F2851F003DCA16 /* QTFFAVViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 427275E016F2851F003DCA16 /* QTFFAVViewController.m */; };
 		427275E416F28798003DCA16 /* QTFFAVCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 427275E316F28798003DCA16 /* QTFFAVCapture.m */; };
+		42A5840B16F8FD1E00E1AF5A /* NSView+BackgroundColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 42A5840A16F8FD1E00E1AF5A /* NSView+BackgroundColor.m */; };
+		42A5840E16F8FD8F00E1AF5A /* NSColor+Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 42A5840D16F8FD8F00E1AF5A /* NSColor+Utils.m */; };
+		42A5841116F9005C00E1AF5A /* NSImage+Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 42A5841016F9005C00E1AF5A /* NSImage+Utils.m */; };
+		42A5841316F9007400E1AF5A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42A5841216F9007400E1AF5A /* CoreGraphics.framework */; };
 		42E2DE3E16F263BF001BB823 /* QTFFAVStreamer.m in Sources */ = {isa = PBXBuildFile; fileRef = 42E2DE3D16F263BF001BB823 /* QTFFAVStreamer.m */; };
 		42E2DE4016F26485001BB823 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE3F16F26485001BB823 /* QTKit.framework */; };
 		42E2DE4816F264A8001BB823 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE4116F264A8001BB823 /* libavcodec.a */; };
@@ -49,6 +54,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4257385E16F8F7CD00CEE303 /* QTFFAVConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QTFFAVConfig.h; sourceTree = "<group>"; };
+		4257385F16F8F7CD00CEE303 /* QTFFAVConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QTFFAVConfig.m; sourceTree = "<group>"; };
 		426CA03616F24F1E0070B627 /* QTFFmpeg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QTFFmpeg.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		426CA03916F24F1E0070B627 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		426CA03C16F24F1E0070B627 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -72,6 +79,13 @@
 		427275E016F2851F003DCA16 /* QTFFAVViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QTFFAVViewController.m; sourceTree = "<group>"; };
 		427275E216F28798003DCA16 /* QTFFAVCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QTFFAVCapture.h; sourceTree = "<group>"; };
 		427275E316F28798003DCA16 /* QTFFAVCapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QTFFAVCapture.m; sourceTree = "<group>"; };
+		42A5840916F8FD1E00E1AF5A /* NSView+BackgroundColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSView+BackgroundColor.h"; sourceTree = "<group>"; };
+		42A5840A16F8FD1E00E1AF5A /* NSView+BackgroundColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSView+BackgroundColor.m"; sourceTree = "<group>"; };
+		42A5840C16F8FD8F00E1AF5A /* NSColor+Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSColor+Utils.h"; sourceTree = "<group>"; };
+		42A5840D16F8FD8F00E1AF5A /* NSColor+Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSColor+Utils.m"; sourceTree = "<group>"; };
+		42A5840F16F9005C00E1AF5A /* NSImage+Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSImage+Utils.h"; sourceTree = "<group>"; };
+		42A5841016F9005C00E1AF5A /* NSImage+Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSImage+Utils.m"; sourceTree = "<group>"; };
+		42A5841216F9007400E1AF5A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		42E2DE3C16F263BF001BB823 /* QTFFAVStreamer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QTFFAVStreamer.h; sourceTree = "<group>"; };
 		42E2DE3D16F263BF001BB823 /* QTFFAVStreamer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QTFFAVStreamer.m; sourceTree = "<group>"; };
 		42E2DE3F16F26485001BB823 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = System/Library/Frameworks/QTKit.framework; sourceTree = SDKROOT; };
@@ -116,6 +130,7 @@
 				42E2DE6616F26BC0001BB823 /* QuartzCore.framework in Frameworks */,
 				426CA03A16F24F1E0070B627 /* Cocoa.framework in Frameworks */,
 				42E2DE6816F26BDB001BB823 /* VideoDecodeAcceleration.framework in Frameworks */,
+				42A5841316F9007400E1AF5A /* CoreGraphics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -157,6 +172,7 @@
 				42E2DE6316F26B9F001BB823 /* libz.1.2.5.dylib */,
 				42E2DE6116F26B89001BB823 /* libz.dylib */,
 				42E2DE5F16F26B73001BB823 /* libbz2.1.0.5.dylib */,
+				42A5841216F9007400E1AF5A /* CoreGraphics.framework */,
 				42E2DE6716F26BDB001BB823 /* VideoDecodeAcceleration.framework */,
 				42E2DE6516F26BC0001BB823 /* QuartzCore.framework */,
 				42E2DE3F16F26485001BB823 /* QTKit.framework */,
@@ -270,6 +286,12 @@
 				42E2DE5D16F26944001BB823 /* NSDate+Format.m */,
 				42E2DE5516F267B1001BB823 /* NSFileManager+Utils.h */,
 				42E2DE5616F267B1001BB823 /* NSFileManager+Utils.m */,
+				42A5840916F8FD1E00E1AF5A /* NSView+BackgroundColor.h */,
+				42A5840A16F8FD1E00E1AF5A /* NSView+BackgroundColor.m */,
+				42A5840C16F8FD8F00E1AF5A /* NSColor+Utils.h */,
+				42A5840D16F8FD8F00E1AF5A /* NSColor+Utils.m */,
+				42A5840F16F9005C00E1AF5A /* NSImage+Utils.h */,
+				42A5841016F9005C00E1AF5A /* NSImage+Utils.m */,
 				42E2DE5916F268B9001BB823 /* QTFFAppLogFile.h */,
 				42E2DE5A16F268B9001BB823 /* QTFFAppLogFile.m */,
 				42E2DE5816F2684A001BB823 /* QTFFAppLog.h */,
@@ -280,10 +302,12 @@
 		42E2DE5116F2667F001BB823 /* Audio/Video */ = {
 			isa = PBXGroup;
 			children = (
-				42E2DE3C16F263BF001BB823 /* QTFFAVStreamer.h */,
-				42E2DE3D16F263BF001BB823 /* QTFFAVStreamer.m */,
+				4257385E16F8F7CD00CEE303 /* QTFFAVConfig.h */,
+				4257385F16F8F7CD00CEE303 /* QTFFAVConfig.m */,
 				427275E216F28798003DCA16 /* QTFFAVCapture.h */,
 				427275E316F28798003DCA16 /* QTFFAVCapture.m */,
+				42E2DE3C16F263BF001BB823 /* QTFFAVStreamer.h */,
+				42E2DE3D16F263BF001BB823 /* QTFFAVStreamer.m */,
 			);
 			name = Audio/Video;
 			sourceTree = "<group>";
@@ -406,6 +430,10 @@
 				42E2DE5E16F26944001BB823 /* NSDate+Format.m in Sources */,
 				427275E116F2851F003DCA16 /* QTFFAVViewController.m in Sources */,
 				427275E416F28798003DCA16 /* QTFFAVCapture.m in Sources */,
+				4257386016F8F7CD00CEE303 /* QTFFAVConfig.m in Sources */,
+				42A5840B16F8FD1E00E1AF5A /* NSView+BackgroundColor.m in Sources */,
+				42A5840E16F8FD8F00E1AF5A /* NSColor+Utils.m in Sources */,
+				42A5841116F9005C00E1AF5A /* NSImage+Utils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

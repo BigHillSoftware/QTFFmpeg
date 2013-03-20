@@ -43,10 +43,6 @@
 #pragma mark - Video Capture
 
 - (QTCaptureSession *)startVideoCaptureWithDevice:(QTCaptureDevice *)device
-                                  pixelFormatType:(uint)pixelFormatType
-                                        frameSize:(CGSize)frameSize
-                                        frameRate:(NSTimeInterval)frameRate
-                              dropLateVideoFrames:(BOOL)dropLateVideoFrames
                                          delegate:(id)delegate
                                             error:(NSError **)error;
 

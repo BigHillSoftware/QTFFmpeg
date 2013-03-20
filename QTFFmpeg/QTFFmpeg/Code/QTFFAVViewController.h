@@ -16,10 +16,19 @@
 @property (nonatomic, assign) IBOutlet NSView *audioCaptureView;
 @property (nonatomic, assign) IBOutlet NSPopUpButton *availableVideoCaptureDevicesPopUpButton;
 @property (nonatomic, assign) IBOutlet NSPopUpButton *availableAudioCaptureDevicesPopUpButton;
+@property (nonatomic, assign) IBOutlet NSTextField *videoFormatTextField;
+@property (nonatomic, assign) IBOutlet NSTextField *audioFormatTextField;
 @property (nonatomic, assign) IBOutlet NSButton *streamingButton;
+
+#pragma mark - Actions
+
+- (IBAction)availableVideoCaptureDevicesPopupButtonItemSelected:(id)sender;
+- (IBAction)availableAudioCaptureDevicesPopupButtonItemSelected:(id)sender;
+- (IBAction)streamingButtonSelected:(id)sender;
 
 #pragma mark - Processing control
 
 - (void)startProcessing;
+- (void)stopProcessing;
 
 @end
