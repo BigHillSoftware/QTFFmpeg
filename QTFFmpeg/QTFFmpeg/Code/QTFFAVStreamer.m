@@ -672,7 +672,9 @@ void fill_samples(double *dst, int nb_samples, int nb_channels, int sample_rate,
             int sourceNumberOfChannels = av_get_channel_layout_nb_channels(sourceChannelLayout);
             int sourceLineSize = 0;
             int sourceNumberOfSamples = (int)(sampleBuffer.numberOfSamples);
-            uint8_t **sourceData = NULL;
+            
+            void *bytes = sampleBuffer.bytesForAllSamples;
+            uint8_t **sourceData = (uint8_t **)&bytes;
             //uint8_t **sourceData = (uint8_t **)&rawAudioData;
             
             // destination variables

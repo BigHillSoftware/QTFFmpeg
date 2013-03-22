@@ -66,9 +66,6 @@
     
     // create the streamer
     _avStreamer = [[QTFFAVStreamer alloc] init];
-    
-    // UI
-    [_audioCaptureView setBGColor:[NSColor blackColor]];
 }
 
 #pragma mark - Popup display
@@ -233,7 +230,7 @@
         hasPrevious = YES;
     }
     
-    _videoFormatTextField.stringValue = descriptionText;
+    _deviceSupportedVideoFormatTextField.stringValue = descriptionText;
 }
 
 - (void)displayAudioFormatText;
@@ -255,7 +252,7 @@
         hasPrevious = YES;
     }
     
-    _audioFormatTextField.stringValue = descriptionText;
+    _deviceSupportedAudioFormatTextField.stringValue = descriptionText;
 }
 
 
@@ -519,6 +516,44 @@
     [self startAudioCapture];
 }
 
+- (void)updateAudioLevels; //:(NSTimer *)timer
+{
+	// Get the mean audio level from the movie file output's audio connections
+	
+	float totalDecibels = 0.0;
+	
+	NSUInteger i = 0;
+	NSUInteger numberOfPowerLevels = 0;	// Keep track of the total number of power levels in order to take the mean
+
+    NSArray *connections = [_avCapture.audioCaptureDeviceInput connections];
+	for (i = 0; i < [connections count]; i++)
+    {
+        QTCaptureConnection *connection = [connections objectAtIndex:i];
+		
+		if ([[connection mediaType] isEqualToString:QTMediaTypeSound])
+        {
+			NSArray *powerLevels = [connection attributeForKey:QTCaptureConnectionAudioAveragePowerLevelsAttribute];
+			NSUInteger j, powerLevelCount = [powerLevels count];
+			
+			for (j = 0; j < powerLevelCount; j++)
+            {
+				NSNumber *decibels = [powerLevels objectAtIndex:j];
+				totalDecibels += [decibels floatValue];
+				numberOfPowerLevels++;
+			}
+		}
+	}
+	
+	if (numberOfPowerLevels > 0)
+    {
+		[_audioLevelMeter setFloatValue:(pow(10., 0.05 * (totalDecibels / (float)numberOfPowerLevels)) * 20.0)];
+	}
+    else
+    {
+		[_audioLevelMeter setFloatValue:0];
+	}
+}
+
 #pragma mark - Audio Streaming
 
 - (BOOL)startAudioStreaming;
@@ -542,11 +577,9 @@
 {
     if (_isStreamingAudio)
     {
-        /*
          NSError *error = nil;
          
-         BOOL success = [_videoStreamer streamAudioFrame:sampleBuffer
-         error:&error];
+         BOOL success = [_avStreamer streamAudioFrame:sampleBuffer error:&error];
          
          if (success)
          {
@@ -556,7 +589,6 @@
          {
          QTFFAppLog(@"Audio frame streaming failed with error: %@", [error localizedDescription]);
          }
-         */
     }
 }
 
@@ -630,8 +662,11 @@
 {
     if (_isStreamingAudio)
     {
+        _capturedAudioFormatTextField.stringValue = [NSString stringWithFormat:@"∙ %@", [sampleBuffer.formatDescription localizedFormatSummary]];
         [self streamAudioFrame:sampleBuffer];
     }
+    
+    [self performSelector:@selector(updateAudioLevels)];
 }
 
 #pragma mark - QTCaptureDecompressedVideoOutputDelegate Methods
@@ -648,6 +683,7 @@
 {
     if (_isStreamingVideo)
     {
+        _capturedVideoFormatTextField.stringValue = [NSString stringWithFormat:@"∙ %@", [sampleBuffer.formatDescription localizedFormatSummary]];
         [self streamVideoFrame:videoFrame];
     }
 }
@@ -699,7 +735,7 @@
     if (indexOfSelectedItem != _lastSelectedAudioCaptureDeviceIndex)
     {
         // load restart video
-        //[self performSelectorOnMainThread:@selector(restartAudioCapture) withObject:nil waitUntilDone:NO];
+        [self performSelectorOnMainThread:@selector(restartAudioCapture) withObject:nil waitUntilDone:NO];
     }
     
     _lastSelectedAudioCaptureDeviceIndex = indexOfSelectedItem;

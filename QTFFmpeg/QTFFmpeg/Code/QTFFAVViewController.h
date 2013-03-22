@@ -13,11 +13,13 @@
 @interface QTFFAVViewController : NSViewController
 
 @property (nonatomic, assign) IBOutlet QTCaptureView *videoCaptureView;
-@property (nonatomic, assign) IBOutlet NSView *audioCaptureView;
 @property (nonatomic, assign) IBOutlet NSPopUpButton *availableVideoCaptureDevicesPopUpButton;
 @property (nonatomic, assign) IBOutlet NSPopUpButton *availableAudioCaptureDevicesPopUpButton;
-@property (nonatomic, assign) IBOutlet NSTextField *videoFormatTextField;
-@property (nonatomic, assign) IBOutlet NSTextField *audioFormatTextField;
+@property (nonatomic, assign) IBOutlet NSLevelIndicator	*audioLevelMeter;
+@property (nonatomic, assign) IBOutlet NSTextField *deviceSupportedVideoFormatTextField;
+@property (nonatomic, assign) IBOutlet NSTextField *deviceSupportedAudioFormatTextField;
+@property (nonatomic, assign) IBOutlet NSTextField *capturedVideoFormatTextField;
+@property (nonatomic, assign) IBOutlet NSTextField *capturedAudioFormatTextField;
 @property (nonatomic, assign) IBOutlet NSButton *streamingButton;
 
 #pragma mark - Actions
