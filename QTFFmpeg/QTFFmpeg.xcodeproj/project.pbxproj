@@ -523,6 +523,7 @@
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../FFmpeg/libs/MacOSX/x86_64/lib\"";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
+				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -551,6 +552,7 @@
 				HEADER_SEARCH_PATHS = "../FFmpeg/libs/MacOSX/x86_64/include/**";
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../FFmpeg/libs/MacOSX/x86_64/lib\"";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -567,6 +569,7 @@
 					"\"$(SRCROOT)/../FFmpeg/libs/MacOSX/x86_64/lib\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				RUN_CLANG_STATIC_ANALYZER = YES;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -583,6 +586,7 @@
 					"\"$(SRCROOT)/../FFmpeg/libs/MacOSX/x86_64/lib\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				RUN_CLANG_STATIC_ANALYZER = YES;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

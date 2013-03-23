@@ -8,6 +8,7 @@
 
 #import "QTFFAVConfig.h"
 #include <libavutil/channel_layout.h>
+#include <libavcodec/avcodec.h>
 #import "NSFileManager+Utils.h"
 
 #define VIDEO_CAPTURE_INCLUDE_INTERNAL_CAMERA                   YES
@@ -43,7 +44,6 @@
 #define AUDIO_CODEC_CHANNEL_LAYOUT                              AV_CH_LAYOUT_STEREO
 #define AUDIO_CODEC_NUMBER_OF_CHANNELS                          2
 #define AUDIO_CODEC_SAMPLE_FORMAT                               AV_SAMPLE_FMT_S16
-
 
 
 static QTFFAVConfig *_sharedInstance;

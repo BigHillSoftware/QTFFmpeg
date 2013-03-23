@@ -337,7 +337,7 @@
     //_inputAudioFrame = [self audioFrame];
     
     // initialize the output audio frame
-    _streamAudioFrame = [self audioFrame];
+    _streamAudioFrame = [self newAudioFrame];
     
     return YES;
 }
@@ -421,7 +421,7 @@
     return frame;
 }
 
-- (AVFrame *)audioFrame;
+- (AVFrame *)newAudioFrame;
 {
     /* frame containing input raw audio */
     AVFrame *frame = avcodec_alloc_frame();
@@ -575,11 +575,13 @@
                                               description:[NSString stringWithFormat:@"Unable to write the video frame to the stream, error: %d", returnVal]];
                     }
                     
+                    av_free_packet(&avPacket);
+                    
                     return NO;
                 }
+                
+                av_free_packet(&avPacket);
             }
-            
-            //avpicture_free((AVPicture *)avFrame);
             
             return YES;
         }
@@ -633,25 +635,6 @@ static int get_format_from_sample_fmt(const char **fmt,
     return AVERROR(EINVAL);
 }
 
-/**
- * Fill dst buffer with nb_samples, generated starting from t.
- */
-void fill_samples(double *dst, int nb_samples, int nb_channels, int sample_rate, double *t)
-{
-    int i, j;
-    double tincr = 1.0 / sample_rate, *dstp = dst;
-    const double c = 2 * M_PI * 440.0;
-    
-    /* generate sin tone with 440Hz frequency and duplicated channels */
-    for (i = 0; i < nb_samples; i++) {
-        *dstp = sin(c * *t);
-        for (j = 1; j < nb_channels; j++)
-            dstp[j] = dstp[0];
-        dstp += nb_channels;
-        *t += tincr;
-    }
-}
-
 - (BOOL)streamAudioFrame:(QTSampleBuffer *)sampleBuffer
                    error:(NSError **)error;
 {
@@ -673,9 +656,15 @@ void fill_samples(double *dst, int nb_samples, int nb_channels, int sample_rate,
             int sourceLineSize = 0;
             int sourceNumberOfSamples = (int)(sampleBuffer.numberOfSamples);
             
-            void *bytes = sampleBuffer.bytesForAllSamples;
-            uint8_t **sourceData = (uint8_t **)&bytes;
+            //int size = 100 * sizeof(char);
+            //char *buff = malloc(size);
+            //char *name = av_get_sample_fmt_string(buff, size, sourceSampleFormat);
+            //QTFFAppLog(@"Source sample format: %s", name);
+            
+            //void *bytes = sampleBuffer.bytesForAllSamples;
+            //uint8_t **sourceData = (uint8_t **)&bytes;
             //uint8_t **sourceData = (uint8_t **)&rawAudioData;
+            uint8_t **sourceData = NULL;
             
             // destination variables
             int64_t destinationChannelLayout = codecCtx->channel_layout;
@@ -683,7 +672,10 @@ void fill_samples(double *dst, int nb_samples, int nb_channels, int sample_rate,
             enum AVSampleFormat destinationSampleFormat = codecCtx->sample_fmt;
             int destinationNumberOfChannels = codecCtx->channels;
             int destinationNumberOfSamples = codecCtx->frame_size;
-            
+
+            //name = av_get_sample_fmt_string(buff, size, destinationSampleFormat);
+            //QTFFAppLog(@"Destination sample format: %s", name);
+
             int destinationLineSize = 0;
             uint8_t **destinationData = NULL;
             
@@ -768,52 +760,54 @@ void fill_samples(double *dst, int nb_samples, int nb_channels, int sample_rate,
                                           description:description];
                 }
                 
+                free(sourceData);
+
                 return NO;
             }
             
-            /*
-             
-             // fill the source samples buffer
-             //float *qtbuffer = sampleBuffer.bytesForAllSamples;
-             
-             AudioBufferList *tempAudioBufferList = [sampleBuffer audioBufferListWithOptions:0];
-             float *rawAudioData = av_malloc((int)sampleBuffer.lengthForAllSamples * sizeof(float));
-             const float *b1Ptr, *b2Ptr;
-             b1Ptr = (const float *) tempAudioBufferList->mBuffers[0].mData,
-             b2Ptr = (const float *) tempAudioBufferList->mBuffers[1].mData;
-             
-             //QTFFAppLog(@"Length for all samples: %d", (int)sampleBuffer.lengthForAllSamples);
-             //QTFFAppLog(@"Number of buffers = %d", tempAudioBufferList->mNumberBuffers);
-             
-             for (NSInteger i = 0; i < sampleBuffer.numberOfSamples; i++)
-             {
-             //QTFFAppLog(@"Sample %d value: %f", (int)i, *b1Ptr);
-             *rawAudioData++ = *b1Ptr++;
-             *rawAudioData++ = *b2Ptr++;
-             }
-             
-             returnVal = av_samples_fill_arrays(sourceData,
-             &sourceLineSize,
-             //(const uint8_t *)&qtbuffer,
-             (const uint8_t *)&rawAudioData,
-             sourceNumberOfChannels,
-             sourceNumberOfSamples,
-             sourceSampleFormat,
-             0);
-             
-             //QTFFAppLog(@"Source line size = %d", sourceLineSize);
-             
-             if (returnVal < 0)
-             {
-             if (error)
-             {
-             NSString *description = [NSString stringWithFormat:@"Unable to fill the sample array with captured audio data, error: %d", returnVal];
-             *error = [NSError errorWithDomain:QTFFVideoErrorDomain code:QTFFErrorCode_VideoStreamingError description:description];
-             }
-             
-             return NO;
-             }
-             */
+            // fill the source samples buffer
+            //float *qtbuffer = sampleBuffer.bytesForAllSamples;
+            
+            AudioBufferList *tempAudioBufferList = [sampleBuffer audioBufferListWithOptions:0];
+            float *rawAudioData = av_malloc((int)sampleBuffer.lengthForAllSamples * sizeof(float));
+            const float *ch1Ptr, *ch2Ptr;
+            ch1Ptr = (const float *)tempAudioBufferList->mBuffers[0].mData,
+            ch2Ptr = (const float *)tempAudioBufferList->mBuffers[1].mData;
+            
+            //QTFFAppLog(@"Length for all samples: %d", (int)sampleBuffer.lengthForAllSamples);
+            //QTFFAppLog(@"Number of buffers = %d", tempAudioBufferList->mNumberBuffers);
+            
+            for (NSInteger i = 0; i < sampleBuffer.numberOfSamples; i++)
+            {
+                //QTFFAppLog(@"Sample %d value: %f", (int)i, *b1Ptr);
+                *rawAudioData++ = *ch1Ptr++;
+                *rawAudioData++ = *ch2Ptr++;
+            }
+            
+            returnVal = av_samples_fill_arrays(sourceData,
+                                               &sourceLineSize,
+                                               //(const uint8_t *)&qtbuffer,
+                                               (const uint8_t *)&rawAudioData,
+                                               sourceNumberOfChannels,
+                                               sourceNumberOfSamples,
+                                               sourceSampleFormat,
+                                               0);
+            
+            //QTFFAppLog(@"Source line size = %d", sourceLineSize);
+            
+            if (returnVal < 0)
+            {
+                if (error)
+                {
+                    NSString *description = [NSString stringWithFormat:@"Unable to fill the sample array with captured audio data, error: %d", returnVal];
+                    *error = [NSError errorWithDomain:QTFFVideoErrorDomain code:QTFFErrorCode_VideoStreamingError description:description];
+                }
+                
+                free(sourceData);
+                free(destinationData);
+                
+                return NO;
+            }
             
             // convert to destination format
             returnVal = swr_convert(resamplerCtx,
@@ -830,20 +824,19 @@ void fill_samples(double *dst, int nb_samples, int nb_channels, int sample_rate,
                     *error = [NSError errorWithDomain:QTFFVideoErrorDomain code:QTFFErrorCode_VideoStreamingError description:description];
                 }
                 
+                free(sourceData);
+                free(destinationData);
+                
                 return NO;
             }
             
             int buffer_size = av_samples_get_buffer_size(&destinationLineSize, codecCtx->channels, codecCtx->frame_size, codecCtx->sample_fmt, 0);
             //QTFFAppLog(@"Buffer size: %d", buffer_size);
             
-            //_streamAudioFrame->nb_samples = codecCtx->frame_size;
-            //_streamAudioFrame->format = codecCtx->sample_fmt;
-            //_streamAudioFrame->channel_layout = codecCtx->channel_layout;
-            
             returnVal = avcodec_fill_audio_frame(_streamAudioFrame,
                                                  codecCtx->channels,
                                                  codecCtx->sample_fmt,
-                                                 (const uint8_t*)destinationData[0],
+                                                 (const uint8_t*)&destinationData[0],
                                                  buffer_size,
                                                  0);
             
@@ -856,6 +849,9 @@ void fill_samples(double *dst, int nb_samples, int nb_channels, int sample_rate,
                                           description:[NSString stringWithFormat:@"Unable to fill the audio frame with captured audio data, error: %d", returnVal]];
                 }
                 
+                free(sourceData);
+                free(destinationData);
+
                 return NO;
             }
             
@@ -879,6 +875,9 @@ void fill_samples(double *dst, int nb_samples, int nb_channels, int sample_rate,
                 }
                 
                 return NO;
+                
+                free(sourceData);
+                free(destinationData);
             }
             
             // if a packet was returned, write it to the network stream. The codec may take several calls before returning a packet.
@@ -910,13 +909,21 @@ void fill_samples(double *dst, int nb_samples, int nb_channels, int sample_rate,
                                                      code:QTFFErrorCode_VideoStreamingError
                                               description:[NSString stringWithFormat:@"Unable to write the audio frame to the stream, error: %d", returnVal]];
                     }
+
+                    av_free_packet(&avPacket);
+
+                    free(sourceData);
+                    free(destinationData);
                     
                     return NO;
                 }
+                
+                av_free_packet(&avPacket);
             }
             
-            //avpicture_free((AVPicture *)avFrame);
-            
+            free(sourceData);
+            free(destinationData);
+
             return YES;
         }
     }
