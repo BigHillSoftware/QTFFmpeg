@@ -20,6 +20,7 @@
 		426CA06416F24F1F0070B627 /* QTFFmpegTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 426CA06316F24F1F0070B627 /* QTFFmpegTests.m */; };
 		427275E116F2851F003DCA16 /* QTFFAVViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 427275E016F2851F003DCA16 /* QTFFAVViewController.m */; };
 		427275E416F28798003DCA16 /* QTFFAVCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 427275E316F28798003DCA16 /* QTFFAVCapture.m */; };
+		42759E3616FF4CE0006F09BB /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42759E3516FF4CE0006F09BB /* ApplicationServices.framework */; };
 		42A5840B16F8FD1E00E1AF5A /* NSView+BackgroundColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 42A5840A16F8FD1E00E1AF5A /* NSView+BackgroundColor.m */; };
 		42A5840E16F8FD8F00E1AF5A /* NSColor+Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 42A5840D16F8FD8F00E1AF5A /* NSColor+Utils.m */; };
 		42A5841116F9005C00E1AF5A /* NSImage+Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 42A5841016F9005C00E1AF5A /* NSImage+Utils.m */; };
@@ -79,6 +80,7 @@
 		427275E016F2851F003DCA16 /* QTFFAVViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QTFFAVViewController.m; sourceTree = "<group>"; };
 		427275E216F28798003DCA16 /* QTFFAVCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QTFFAVCapture.h; sourceTree = "<group>"; };
 		427275E316F28798003DCA16 /* QTFFAVCapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QTFFAVCapture.m; sourceTree = "<group>"; };
+		42759E3516FF4CE0006F09BB /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
 		42A5840916F8FD1E00E1AF5A /* NSView+BackgroundColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSView+BackgroundColor.h"; sourceTree = "<group>"; };
 		42A5840A16F8FD1E00E1AF5A /* NSView+BackgroundColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSView+BackgroundColor.m"; sourceTree = "<group>"; };
 		42A5840C16F8FD8F00E1AF5A /* NSColor+Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSColor+Utils.h"; sourceTree = "<group>"; };
@@ -117,6 +119,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				42759E3616FF4CE0006F09BB /* ApplicationServices.framework in Frameworks */,
 				42E2DE6416F26B9F001BB823 /* libz.1.2.5.dylib in Frameworks */,
 				42E2DE6016F26B73001BB823 /* libbz2.1.0.5.dylib in Frameworks */,
 				42E2DE4816F264A8001BB823 /* libavcodec.a in Frameworks */,
@@ -149,6 +152,7 @@
 		426CA02D16F24F1E0070B627 = {
 			isa = PBXGroup;
 			children = (
+				42759E3516FF4CE0006F09BB /* ApplicationServices.framework */,
 				426CA03F16F24F1E0070B627 /* QTFFmpeg */,
 				426CA05C16F24F1F0070B627 /* QTFFmpegTests */,
 				426CA03816F24F1E0070B627 /* Frameworks */,
@@ -521,7 +525,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "../FFmpeg/libs/MacOSX/x86_64/include/**";
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../FFmpeg/libs/MacOSX/x86_64/lib\"";
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
@@ -551,7 +555,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "../FFmpeg/libs/MacOSX/x86_64/include/**";
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../FFmpeg/libs/MacOSX/x86_64/lib\"";
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
 			};
@@ -568,6 +572,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../FFmpeg/libs/MacOSX/x86_64/lib\"",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				WRAPPER_EXTENSION = app;
@@ -585,6 +590,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../FFmpeg/libs/MacOSX/x86_64/lib\"",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				WRAPPER_EXTENSION = app;
