@@ -152,7 +152,6 @@
 		426CA02D16F24F1E0070B627 = {
 			isa = PBXGroup;
 			children = (
-				42759E3516FF4CE0006F09BB /* ApplicationServices.framework */,
 				426CA03F16F24F1E0070B627 /* QTFFmpeg */,
 				426CA05C16F24F1F0070B627 /* QTFFmpegTests */,
 				426CA03816F24F1E0070B627 /* Frameworks */,
@@ -176,6 +175,7 @@
 				42E2DE6316F26B9F001BB823 /* libz.1.2.5.dylib */,
 				42E2DE6116F26B89001BB823 /* libz.dylib */,
 				42E2DE5F16F26B73001BB823 /* libbz2.1.0.5.dylib */,
+				42759E3516FF4CE0006F09BB /* ApplicationServices.framework */,
 				42A5841216F9007400E1AF5A /* CoreGraphics.framework */,
 				42E2DE6716F26BDB001BB823 /* VideoDecodeAcceleration.framework */,
 				42E2DE6516F26BC0001BB823 /* QuartzCore.framework */,
