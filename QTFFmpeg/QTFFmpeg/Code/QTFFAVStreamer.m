@@ -642,6 +642,44 @@ static int get_format_from_sample_fmt(const char **fmt,
     {
         if (_isStreaming)
         {
+            /*
+             QTFormatDescription *formatDescription = [sampleBuffer formatDescription];
+             NSValue *sampleBufferASBDValue = [formatDescription attributeForKey:QTFormatDescriptionAudioStreamBasicDescriptionAttribute ];
+             
+             if (! sampleBufferASBDValue)
+             return NO;
+             
+             AudioStreamBasicDescription sampleBufferASBD = {0};
+             memset (&sampleBufferASBD, 0, sizeof (sampleBufferASBD));
+             
+             [sampleBufferASBDValue getValue:&sampleBufferASBD];
+             
+             printf( "!!!UncompressedVideoOutput::outputAudioSampleBuffer(), sampleBufferASBD.mBytesPerFrame=%d\n", sampleBufferASBD.mBytesPerFrame);
+             printf( "!!!UncompressedVideoOutput::outputAudioSampleBuffer(), sampleBufferASBD.mSampleRate=%f\n", sampleBufferASBD.mSampleRate);
+             printf( "!!!UncompressedVideoOutput::outputAudioSampleBuffer(), sampleBufferASBD.mBitsPerChannel=%d\n", sampleBufferASBD.mBitsPerChannel);
+             printf( "!!!UncompressedVideoOutput::outputAudioSampleBuffer(), sampleBufferASBD.mFramesPerPacket=%d\n", sampleBufferASBD.mFramesPerPacket);
+             printf( "!!!UncompressedVideoOutput::outputAudioSampleBuffer(), sampleBufferASBD.mFormatFlags=%x\n", sampleBufferASBD.mFormatFlags);
+             printf( "!!!UncompressedVideoOutput::outputAudioSampleBuffer(), sampleBufferASBD.mBytesPerFrame=%x\n", sampleBufferASBD.mBytesPerFrame);
+             
+             printf( "!!!UncompressedVideoOutput::outputAudioSampleBuffer(), sampleBufferASBD.mFormatFlags kAudioFormatFlagIsFloat=%d\n", (sampleBufferASBD.mFormatFlags & kAudioFormatFlagIsFloat) == kAudioFormatFlagIsFloat);
+             printf( "!!!UncompressedVideoOutput::outputAudioSampleBuffer(), sampleBufferASBD.mFormatFlags kAudioFormatFlagIsBigEndian=%d\n", (sampleBufferASBD.mFormatFlags & kAudioFormatFlagIsBigEndian) == kAudioFormatFlagIsBigEndian);
+             printf( "!!!UncompressedVideoOutput::outputAudioSampleBuffer(), sampleBufferASBD.mFormatFlags kLinearPCMFormatFlagIsNonMixable=%d \n", (sampleBufferASBD.mFormatFlags & kLinearPCMFormatFlagIsNonMixable) == kLinearPCMFormatFlagIsNonMixable);
+             printf( "!!!UncompressedVideoOutput::outputAudioSampleBuffer(), sampleBufferASBD.mFormatFlags kLinearPCMFormatFlagIsAlignedHigh=%d \n", (sampleBufferASBD.mFormatFlags & kLinearPCMFormatFlagIsAlignedHigh) == kLinearPCMFormatFlagIsAlignedHigh);
+             printf( "!!!UncompressedVideoOutput::outputAudioSampleBuffer(), sampleBufferASBD.mFormatFlags kLinearPCMFormatFlagIsPacked=%d\n", (sampleBufferASBD.mFormatFlags & kLinearPCMFormatFlagIsPacked) == kLinearPCMFormatFlagIsPacked);
+             printf( "!!!UncompressedVideoOutput::outputAudioSampleBuffer(), sampleBufferASBD.mFormatFlags kLinearPCMFormatFlagsSampleFractionShift=%d\n", (sampleBufferASBD.mFormatFlags & kLinearPCMFormatFlagsSampleFractionShift) == kLinearPCMFormatFlagsSampleFractionShift);
+             
+             printf( "!!!UncompressedVideoOutput::outputAudioSampleBuffer(), sampleBufferASBD.mFormatFlags kAudioFormatFlagIsNonInterleaved=%d \n", (sampleBufferASBD.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == kAudioFormatFlagIsNonInterleaved);
+             printf( "!!!UncompressedVideoOutput::outputAudioSampleBuffer(), sampleBufferASBD.mFormatFlags kAudioFormatFlagIsSignedInteger=%d \n", (sampleBufferASBD.mFormatFlags & kAudioFormatFlagIsSignedInteger) == kAudioFormatFlagIsSignedInteger);
+             
+             printf( "!!!UncompressedVideoOutput::outputAudioSampleBuffer(), sampleBufferASBD.mFormatID=%c\n", sampleBufferASBD.mFormatID);
+             printf( "!!!UncompressedVideoOutput::outputAudioSampleBuffer(), sampleBufferASBD.mFormatID=%c\n", sampleBufferASBD.mFormatID >> 8);
+             printf( "!!!UncompressedVideoOutput::outputAudioSampleBuffer(), sampleBufferASBD.mFormatID=%c\n", sampleBufferASBD.mFormatID >> 16);
+             printf( "!!!UncompressedVideoOutput::outputAudioSampleBuffer(), sampleBufferASBD.mFormatID=%c\n", sampleBufferASBD.mFormatID >> 24);
+             
+             printf(" lengthForAllSamples=%ld, numberOfSamples=%ld\n", (unsigned long)[sampleBuffer lengthForAllSamples], (unsigned long)[sampleBuffer numberOfSamples]);
+             fflush(stdout);
+             */
+            
             // get the codec context
             AVCodecContext *codecCtx = _audioStream->codec;
             
@@ -672,10 +710,10 @@ static int get_format_from_sample_fmt(const char **fmt,
             enum AVSampleFormat destinationSampleFormat = codecCtx->sample_fmt;
             int destinationNumberOfChannels = codecCtx->channels;
             int destinationNumberOfSamples = codecCtx->frame_size;
-
+            
             //name = av_get_sample_fmt_string(buff, size, destinationSampleFormat);
             //QTFFAppLog(@"Destination sample format: %s", name);
-
+            
             int destinationLineSize = 0;
             uint8_t **destinationData = NULL;
             
@@ -761,7 +799,7 @@ static int get_format_from_sample_fmt(const char **fmt,
                 }
                 
                 free(sourceData);
-
+                
                 return NO;
             }
             
@@ -851,7 +889,7 @@ static int get_format_from_sample_fmt(const char **fmt,
                 
                 free(sourceData);
                 free(destinationData);
-
+                
                 return NO;
             }
             
@@ -909,9 +947,9 @@ static int get_format_from_sample_fmt(const char **fmt,
                                                      code:QTFFErrorCode_VideoStreamingError
                                               description:[NSString stringWithFormat:@"Unable to write the audio frame to the stream, error: %d", returnVal]];
                     }
-
+                    
                     av_free_packet(&avPacket);
-
+                    
                     free(sourceData);
                     free(destinationData);
                     
@@ -923,7 +961,7 @@ static int get_format_from_sample_fmt(const char **fmt,
             
             free(sourceData);
             free(destinationData);
-
+            
             return YES;
         }
     }
