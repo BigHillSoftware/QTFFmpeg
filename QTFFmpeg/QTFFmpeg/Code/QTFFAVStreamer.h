@@ -12,6 +12,8 @@
 
 @interface QTFFAVStreamer : NSObject
 
+@property (nonatomic, readonly) BOOL isStreaming;
+
 #pragma mark - Stream opening and closing
 
 - (BOOL)openStream:(NSError **)error;
@@ -21,8 +23,7 @@
 #pragma mark - Frame streaming
 
 - (BOOL)streamVideoFrame:(CVImageBufferRef)frameBuffer
-        presentationTime:(NSInteger)presentationTime
-              decodeTime:(NSInteger)decodeTime
+            sampleBuffer:(QTSampleBuffer *)sampleBuffer
                    error:(NSError **)error;
 
 - (BOOL)streamAudioFrame:(QTSampleBuffer *)sampleBuffer

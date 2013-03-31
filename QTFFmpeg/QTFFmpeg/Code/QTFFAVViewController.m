@@ -401,15 +401,15 @@
     return YES;
 }
 
-- (void)streamVideoFrame:(CVImageBufferRef)videoFrame;
+- (void)streamVideoFrame:(CVImageBufferRef)videoFrame
+            sampleBuffer:(QTSampleBuffer *)sampleBuffer;
 {
     if (_isStreamingVideo)
     {
         NSError *error = nil;
         
         BOOL success = [_avStreamer streamVideoFrame:videoFrame
-                                    presentationTime:0
-                                          decodeTime:0
+                                        sampleBuffer:sampleBuffer
                                                error:&error];
         
         if (success)
@@ -524,7 +524,7 @@
 	
 	NSUInteger i = 0;
 	NSUInteger numberOfPowerLevels = 0;	// Keep track of the total number of power levels in order to take the mean
-
+    
     NSArray *connections = [_avCapture.audioCaptureDeviceInput connections];
 	for (i = 0; i < [connections count]; i++)
     {
@@ -562,7 +562,7 @@
     {
         // get the config
         QTFFAVConfig *config = [QTFFAVConfig sharedConfig];
-
+        
         QTFFAppLog(@"Starting audio streaming to URL: %@", config.streamOutputStreamName);
         
         _isStreamingAudio = YES;
@@ -577,18 +577,18 @@
 {
     if (_isStreamingAudio)
     {
-         NSError *error = nil;
-         
-         BOOL success = [_avStreamer streamAudioFrame:sampleBuffer error:&error];
-         
-         if (success)
-         {
-         //QTFFAppLog(@"Audio frame streaming succeeded.");
-         }
-         else
-         {
-         QTFFAppLog(@"Audio frame streaming failed with error: %@", [error localizedDescription]);
-         }
+        NSError *error = nil;
+        
+        BOOL success = [_avStreamer streamAudioFrame:sampleBuffer error:&error];
+        
+        if (success)
+        {
+            //QTFFAppLog(@"Audio frame streaming succeeded.");
+        }
+        else
+        {
+            QTFFAppLog(@"Audio frame streaming failed with error: %@", [error localizedDescription]);
+        }
     }
 }
 
@@ -684,7 +684,7 @@
     if (_isStreamingVideo)
     {
         _capturedVideoFormatTextField.stringValue = [NSString stringWithFormat:@"∙ %@", [sampleBuffer.formatDescription localizedFormatSummary]];
-        [self streamVideoFrame:videoFrame];
+        [self streamVideoFrame:videoFrame sampleBuffer:sampleBuffer];
     }
 }
 

@@ -12,13 +12,16 @@
 #import "NSFileManager+Utils.h"
 
 #define VIDEO_CAPTURE_INCLUDE_INTERNAL_CAMERA                   YES
-#define VIDEO_CAPTURE_DROP_LATE_FRAMES                          YES
-#define VIDEO_CAPTURE_FRAMES_PER_SECOND                         24
+#define VIDEO_CAPTURE_DROP_LATE_FRAMES                          NO
+#define VIDEO_CAPTURE_FRAME_RATE                                30.0
 #define VIDEO_CAPTURE_SET_PIXEL_BUFFER_SIZE                     YES
 #define VIDEO_CAPTURE_PIXEL_BUFFER_WIDTH                        384.0
 #define VIDEO_CAPTURE_PIXEL_BUFFER_HEIGHT                       216.0
 #define VIDEO_CAPTURE_SET_PIXEL_BUFFER_FORMAT_TYPE              YES
 #define VIDEO_CAPTURE_PIXEL_BUFFER_FORMAT_TYPE                  kCVPixelFormatType_422YpCbCr8
+
+#define SHOULD_STREAM_AUDIO                                     YES
+#define SHOULD_STREAM_VIDEO                                     YES
 
 #define STREAM_OUTPUT_STREAM_TYPE                               QTFFStreamTypeFile
 #define STREAM_OUTPUT_STREAM_NAME                               @"Output.flv"
@@ -30,14 +33,14 @@
 #define VIDEO_CODEC_PIXEL_FORMAT                                AV_PIX_FMT_YUV420P
 #define VIDEO_CODEC_GOP_SIZE                                    15
 #define VIDEO_CODEC_BIT_RATE_PREFERRED_KBPS                     372
-#define VIDEO_CODEC_FRAMES_PER_SECOND                           24
+#define VIDEO_CODEC_FRAME_RATE                                  24
 #define VIDEO_CODEC_FRAME_WIDTH                                 352
 #define VIDEO_CODEC_FRAME_HEIGHT                                264
 
 #define AUDIO_INPUT_SAMPLE_RATE                                 44100
 #define AUDIO_INPUT_CHANNEL_LAYOUT                              AV_CH_LAYOUT_STEREO
 #define AUDIO_INPUT_NUMBER_OF_CHANNELS                          2
-#define AUDIO_INPUT_SAMPLE_FORMAT                               AV_SAMPLE_FMT_FLT
+#define AUDIO_INPUT_SAMPLE_FORMAT                               AV_SAMPLE_FMT_FLTP
 
 #define AUDIO_CODEC_BIT_RATE_PREFERRED_KBPS                     192
 #define AUDIO_CODEC_SAMPLE_RATE                                 44100
@@ -73,12 +76,15 @@ static QTFFAVConfig *_sharedInstance;
     {
         _videoCaptureIncludeInternalCamera = VIDEO_CAPTURE_INCLUDE_INTERNAL_CAMERA;
         _videoCaptureDropLateFrames = VIDEO_CAPTURE_DROP_LATE_FRAMES;
-        _videoCaptureFramesPerSecond = VIDEO_CAPTURE_FRAMES_PER_SECOND;
+        _videoCaptureFrameRate = VIDEO_CAPTURE_FRAME_RATE;
         _videoCaptureSetPixelBufferSize = VIDEO_CAPTURE_SET_PIXEL_BUFFER_SIZE;
         _videoCapturePixelBufferWidth = VIDEO_CAPTURE_PIXEL_BUFFER_WIDTH;
         _videoCapturePixelBufferHeight = VIDEO_CAPTURE_PIXEL_BUFFER_HEIGHT;
         _videoCaptureSetPixelBufferFormatType = VIDEO_CAPTURE_SET_PIXEL_BUFFER_FORMAT_TYPE;
         _videoCapturePixelBufferFormatType = VIDEO_CAPTURE_PIXEL_BUFFER_FORMAT_TYPE;
+        
+        _shouldStreamAudio = SHOULD_STREAM_AUDIO;
+        _shouldStreamVideo = SHOULD_STREAM_VIDEO;
         
         //_streamOutputStreamName = STREAM_OUTPUT_STREAM_NAME;
         NSString *desktopDirectory = [[[NSFileManager alloc] init] desktopDirectory];
@@ -92,7 +98,7 @@ static QTFFAVConfig *_sharedInstance;
         _videoCodecPixelFormat = VIDEO_CODEC_PIXEL_FORMAT;
         _videoCodecGOPSize = VIDEO_CODEC_GOP_SIZE;
         _videoCodecBitRatePreferredKbps = VIDEO_CODEC_BIT_RATE_PREFERRED_KBPS;
-        _videoCodecFramesPerSecond = VIDEO_CODEC_FRAMES_PER_SECOND;
+        _videoCodecFrameRate = VIDEO_CODEC_FRAME_RATE;
         _videoCodecFrameWidth = VIDEO_CODEC_FRAME_WIDTH;
         _videoCodecFrameHeight = VIDEO_CODEC_FRAME_HEIGHT;
         
@@ -113,9 +119,9 @@ static QTFFAVConfig *_sharedInstance;
 
 #pragma mark - Properties
 
-- (CGFloat)videoCaptureFrameRate;
+- (NSTimeInterval)videoCaptureFrameInterval;
 {
-    return 1.0 / _videoCaptureFramesPerSecond;
+    return 1.0 / _videoCaptureFrameRate;
 }
 
 @end

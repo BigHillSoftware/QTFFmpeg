@@ -22,13 +22,16 @@ typedef enum
 
 @property (nonatomic, assign) BOOL videoCaptureIncludeInternalCamera;
 @property (nonatomic, assign) BOOL videoCaptureDropLateFrames;
-@property (nonatomic, assign) NSInteger videoCaptureFramesPerSecond;
-@property (nonatomic, readonly) CGFloat videoCaptureFrameRate;
+@property (nonatomic, assign) NSInteger videoCaptureFrameRate;
+@property (nonatomic, readonly) NSTimeInterval videoCaptureFrameInterval;
 @property (nonatomic, assign) BOOL videoCaptureSetPixelBufferSize;
 @property (nonatomic, assign) CGFloat videoCapturePixelBufferWidth;
 @property (nonatomic, assign) CGFloat videoCapturePixelBufferHeight;
 @property (nonatomic, assign) BOOL videoCaptureSetPixelBufferFormatType;
 @property (nonatomic, assign) NSUInteger videoCapturePixelBufferFormatType;
+
+@property (nonatomic, assign) BOOL shouldStreamAudio;
+@property (nonatomic, assign) BOOL shouldStreamVideo;
 
 @property (nonatomic, assign) QTFFStreamType streamOutputStreamType;
 @property (nonatomic, strong) NSString *streamOutputStreamName;
@@ -40,7 +43,7 @@ typedef enum
 @property (nonatomic, assign) enum AVPixelFormat videoCodecPixelFormat;
 @property (nonatomic, assign) int videoCodecGOPSize;
 @property (nonatomic, assign) int videoCodecBitRatePreferredKbps;
-@property (nonatomic, assign) int videoCodecFramesPerSecond;
+@property (nonatomic, assign) int videoCodecFrameRate;
 @property (nonatomic, assign) int videoCodecFrameWidth;
 @property (nonatomic, assign) int videoCodecFrameHeight;
 

@@ -7,41 +7,44 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		421C206C17025D2000AEF12D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 426CA04E16F24F1F0070B627 /* MainMenu.xib */; };
+		4227CCDB1702551C00E1D2B3 /* libz.1.2.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE6316F26B9F001BB823 /* libz.1.2.5.dylib */; };
+		4227CCDC1702552000E1D2B3 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE6116F26B89001BB823 /* libz.dylib */; };
+		4227CCDD1702552300E1D2B3 /* libbz2.1.0.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE5F16F26B73001BB823 /* libbz2.1.0.5.dylib */; };
+		4227CCDF1702552F00E1D2B3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42A5841216F9007400E1AF5A /* CoreGraphics.framework */; };
+		4227CCE01702553200E1D2B3 /* VideoDecodeAcceleration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE6716F26BDB001BB823 /* VideoDecodeAcceleration.framework */; };
+		4227CCE11702553600E1D2B3 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE6516F26BC0001BB823 /* QuartzCore.framework */; };
+		4227CCE21702553800E1D2B3 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE3F16F26485001BB823 /* QTKit.framework */; };
+		4227CCE31702553C00E1D2B3 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 426CA03916F24F1E0070B627 /* Cocoa.framework */; };
+		4227CCE51702556800E1D2B3 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE4116F264A8001BB823 /* libavcodec.a */; };
+		4227CCE61702556B00E1D2B3 /* libavdevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE4216F264A8001BB823 /* libavdevice.a */; };
+		4227CCE71702556F00E1D2B3 /* libavfilter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE4316F264A8001BB823 /* libavfilter.a */; };
+		4227CCE81702557200E1D2B3 /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE4416F264A8001BB823 /* libavformat.a */; };
+		4227CCE91702557700E1D2B3 /* libavutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE4516F264A8001BB823 /* libavutil.a */; };
+		4227CCEA1702557A00E1D2B3 /* libswresample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE4616F264A8001BB823 /* libswresample.a */; };
+		4227CCEB1702557E00E1D2B3 /* libswscale.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE4716F264A8001BB823 /* libswscale.a */; };
+		4227CCEC170255EB00E1D2B3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 426CA03E16F24F1E0070B627 /* Foundation.framework */; };
+		4227CCED170255EE00E1D2B3 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 426CA03D16F24F1E0070B627 /* CoreData.framework */; };
+		4227CCEE170255F400E1D2B3 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 426CA03C16F24F1E0070B627 /* AppKit.framework */; };
+		424D5BB3170201D800571C75 /* QTSampleBuffer+Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 424D5BB2170201D800571C75 /* QTSampleBuffer+Utils.m */; };
 		4257386016F8F7CD00CEE303 /* QTFFAVConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4257385F16F8F7CD00CEE303 /* QTFFAVConfig.m */; };
-		426CA03A16F24F1E0070B627 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 426CA03916F24F1E0070B627 /* Cocoa.framework */; };
-		426CA04416F24F1E0070B627 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 426CA04216F24F1E0070B627 /* InfoPlist.strings */; };
 		426CA04616F24F1E0070B627 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 426CA04516F24F1E0070B627 /* main.m */; };
-		426CA04A16F24F1E0070B627 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 426CA04816F24F1E0070B627 /* Credits.rtf */; };
 		426CA04D16F24F1E0070B627 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 426CA04C16F24F1E0070B627 /* AppDelegate.m */; };
-		426CA05016F24F1F0070B627 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 426CA04E16F24F1F0070B627 /* MainMenu.xib */; };
 		426CA05816F24F1F0070B627 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 426CA05716F24F1F0070B627 /* SenTestingKit.framework */; };
 		426CA05916F24F1F0070B627 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 426CA03916F24F1E0070B627 /* Cocoa.framework */; };
 		426CA06116F24F1F0070B627 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 426CA05F16F24F1F0070B627 /* InfoPlist.strings */; };
 		426CA06416F24F1F0070B627 /* QTFFmpegTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 426CA06316F24F1F0070B627 /* QTFFmpegTests.m */; };
 		427275E116F2851F003DCA16 /* QTFFAVViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 427275E016F2851F003DCA16 /* QTFFAVViewController.m */; };
 		427275E416F28798003DCA16 /* QTFFAVCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 427275E316F28798003DCA16 /* QTFFAVCapture.m */; };
-		42759E3616FF4CE0006F09BB /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42759E3516FF4CE0006F09BB /* ApplicationServices.framework */; };
+		429AFE17170256C000C17D6B /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 429AFE16170256C000C17D6B /* ApplicationServices.framework */; };
 		42A5840B16F8FD1E00E1AF5A /* NSView+BackgroundColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 42A5840A16F8FD1E00E1AF5A /* NSView+BackgroundColor.m */; };
 		42A5840E16F8FD8F00E1AF5A /* NSColor+Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 42A5840D16F8FD8F00E1AF5A /* NSColor+Utils.m */; };
 		42A5841116F9005C00E1AF5A /* NSImage+Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 42A5841016F9005C00E1AF5A /* NSImage+Utils.m */; };
-		42A5841316F9007400E1AF5A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42A5841216F9007400E1AF5A /* CoreGraphics.framework */; };
 		42E2DE3E16F263BF001BB823 /* QTFFAVStreamer.m in Sources */ = {isa = PBXBuildFile; fileRef = 42E2DE3D16F263BF001BB823 /* QTFFAVStreamer.m */; };
-		42E2DE4016F26485001BB823 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE3F16F26485001BB823 /* QTKit.framework */; };
-		42E2DE4816F264A8001BB823 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE4116F264A8001BB823 /* libavcodec.a */; };
-		42E2DE4916F264A8001BB823 /* libavdevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE4216F264A8001BB823 /* libavdevice.a */; };
-		42E2DE4A16F264A8001BB823 /* libavfilter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE4316F264A8001BB823 /* libavfilter.a */; };
-		42E2DE4B16F264A8001BB823 /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE4416F264A8001BB823 /* libavformat.a */; };
-		42E2DE4C16F264A8001BB823 /* libavutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE4516F264A8001BB823 /* libavutil.a */; };
-		42E2DE4D16F264A8001BB823 /* libswresample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE4616F264A8001BB823 /* libswresample.a */; };
-		42E2DE4E16F264A8001BB823 /* libswscale.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE4716F264A8001BB823 /* libswscale.a */; };
 		42E2DE5416F2669F001BB823 /* NSError+Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 42E2DE5316F2669F001BB823 /* NSError+Utils.m */; };
 		42E2DE5716F267B1001BB823 /* NSFileManager+Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 42E2DE5616F267B1001BB823 /* NSFileManager+Utils.m */; };
 		42E2DE5B16F268B9001BB823 /* QTFFAppLogFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 42E2DE5A16F268B9001BB823 /* QTFFAppLogFile.m */; };
 		42E2DE5E16F26944001BB823 /* NSDate+Format.m in Sources */ = {isa = PBXBuildFile; fileRef = 42E2DE5D16F26944001BB823 /* NSDate+Format.m */; };
-		42E2DE6016F26B73001BB823 /* libbz2.1.0.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE5F16F26B73001BB823 /* libbz2.1.0.5.dylib */; };
-		42E2DE6416F26B9F001BB823 /* libz.1.2.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE6316F26B9F001BB823 /* libz.1.2.5.dylib */; };
-		42E2DE6616F26BC0001BB823 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE6516F26BC0001BB823 /* QuartzCore.framework */; };
-		42E2DE6816F26BDB001BB823 /* VideoDecodeAcceleration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE6716F26BDB001BB823 /* VideoDecodeAcceleration.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +58,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		424D5BB1170201D800571C75 /* QTSampleBuffer+Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "QTSampleBuffer+Utils.h"; sourceTree = "<group>"; };
+		424D5BB2170201D800571C75 /* QTSampleBuffer+Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "QTSampleBuffer+Utils.m"; sourceTree = "<group>"; };
 		4257385E16F8F7CD00CEE303 /* QTFFAVConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QTFFAVConfig.h; sourceTree = "<group>"; };
 		4257385F16F8F7CD00CEE303 /* QTFFAVConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QTFFAVConfig.m; sourceTree = "<group>"; };
 		426CA03616F24F1E0070B627 /* QTFFmpeg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QTFFmpeg.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -80,7 +85,7 @@
 		427275E016F2851F003DCA16 /* QTFFAVViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QTFFAVViewController.m; sourceTree = "<group>"; };
 		427275E216F28798003DCA16 /* QTFFAVCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QTFFAVCapture.h; sourceTree = "<group>"; };
 		427275E316F28798003DCA16 /* QTFFAVCapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QTFFAVCapture.m; sourceTree = "<group>"; };
-		42759E3516FF4CE0006F09BB /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
+		429AFE16170256C000C17D6B /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
 		42A5840916F8FD1E00E1AF5A /* NSView+BackgroundColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSView+BackgroundColor.h"; sourceTree = "<group>"; };
 		42A5840A16F8FD1E00E1AF5A /* NSView+BackgroundColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSView+BackgroundColor.m"; sourceTree = "<group>"; };
 		42A5840C16F8FD8F00E1AF5A /* NSColor+Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSColor+Utils.h"; sourceTree = "<group>"; };
@@ -119,21 +124,25 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				42759E3616FF4CE0006F09BB /* ApplicationServices.framework in Frameworks */,
-				42E2DE6416F26B9F001BB823 /* libz.1.2.5.dylib in Frameworks */,
-				42E2DE6016F26B73001BB823 /* libbz2.1.0.5.dylib in Frameworks */,
-				42E2DE4816F264A8001BB823 /* libavcodec.a in Frameworks */,
-				42E2DE4916F264A8001BB823 /* libavdevice.a in Frameworks */,
-				42E2DE4A16F264A8001BB823 /* libavfilter.a in Frameworks */,
-				42E2DE4B16F264A8001BB823 /* libavformat.a in Frameworks */,
-				42E2DE4C16F264A8001BB823 /* libavutil.a in Frameworks */,
-				42E2DE4D16F264A8001BB823 /* libswresample.a in Frameworks */,
-				42E2DE4E16F264A8001BB823 /* libswscale.a in Frameworks */,
-				42E2DE4016F26485001BB823 /* QTKit.framework in Frameworks */,
-				42E2DE6616F26BC0001BB823 /* QuartzCore.framework in Frameworks */,
-				426CA03A16F24F1E0070B627 /* Cocoa.framework in Frameworks */,
-				42E2DE6816F26BDB001BB823 /* VideoDecodeAcceleration.framework in Frameworks */,
-				42A5841316F9007400E1AF5A /* CoreGraphics.framework in Frameworks */,
+				4227CCEB1702557E00E1D2B3 /* libswscale.a in Frameworks */,
+				4227CCEA1702557A00E1D2B3 /* libswresample.a in Frameworks */,
+				4227CCE91702557700E1D2B3 /* libavutil.a in Frameworks */,
+				4227CCE81702557200E1D2B3 /* libavformat.a in Frameworks */,
+				4227CCE71702556F00E1D2B3 /* libavfilter.a in Frameworks */,
+				4227CCE61702556B00E1D2B3 /* libavdevice.a in Frameworks */,
+				4227CCE51702556800E1D2B3 /* libavcodec.a in Frameworks */,
+				4227CCDD1702552300E1D2B3 /* libbz2.1.0.5.dylib in Frameworks */,
+				4227CCDB1702551C00E1D2B3 /* libz.1.2.5.dylib in Frameworks */,
+				4227CCDC1702552000E1D2B3 /* libz.dylib in Frameworks */,
+				429AFE17170256C000C17D6B /* ApplicationServices.framework in Frameworks */,
+				4227CCE31702553C00E1D2B3 /* Cocoa.framework in Frameworks */,
+				4227CCE21702553800E1D2B3 /* QTKit.framework in Frameworks */,
+				4227CCE11702553600E1D2B3 /* QuartzCore.framework in Frameworks */,
+				4227CCE01702553200E1D2B3 /* VideoDecodeAcceleration.framework in Frameworks */,
+				4227CCDF1702552F00E1D2B3 /* CoreGraphics.framework in Frameworks */,
+				4227CCEC170255EB00E1D2B3 /* Foundation.framework in Frameworks */,
+				4227CCEE170255F400E1D2B3 /* AppKit.framework in Frameworks */,
+				4227CCED170255EE00E1D2B3 /* CoreData.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -175,7 +184,7 @@
 				42E2DE6316F26B9F001BB823 /* libz.1.2.5.dylib */,
 				42E2DE6116F26B89001BB823 /* libz.dylib */,
 				42E2DE5F16F26B73001BB823 /* libbz2.1.0.5.dylib */,
-				42759E3516FF4CE0006F09BB /* ApplicationServices.framework */,
+				429AFE16170256C000C17D6B /* ApplicationServices.framework */,
 				42A5841216F9007400E1AF5A /* CoreGraphics.framework */,
 				42E2DE6716F26BDB001BB823 /* VideoDecodeAcceleration.framework */,
 				42E2DE6516F26BC0001BB823 /* QuartzCore.framework */,
@@ -312,6 +321,8 @@
 				427275E316F28798003DCA16 /* QTFFAVCapture.m */,
 				42E2DE3C16F263BF001BB823 /* QTFFAVStreamer.h */,
 				42E2DE3D16F263BF001BB823 /* QTFFAVStreamer.m */,
+				424D5BB1170201D800571C75 /* QTSampleBuffer+Utils.h */,
+				424D5BB2170201D800571C75 /* QTSampleBuffer+Utils.m */,
 			);
 			name = Audio/Video;
 			sourceTree = "<group>";
@@ -388,9 +399,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				426CA04416F24F1E0070B627 /* InfoPlist.strings in Resources */,
-				426CA04A16F24F1E0070B627 /* Credits.rtf in Resources */,
-				426CA05016F24F1F0070B627 /* MainMenu.xib in Resources */,
+				421C206C17025D2000AEF12D /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -438,6 +447,7 @@
 				42A5840B16F8FD1E00E1AF5A /* NSView+BackgroundColor.m in Sources */,
 				42A5840E16F8FD8F00E1AF5A /* NSColor+Utils.m in Sources */,
 				42A5841116F9005C00E1AF5A /* NSImage+Utils.m in Sources */,
+				424D5BB3170201D800571C75 /* QTSampleBuffer+Utils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -564,13 +574,20 @@
 		426CA06816F24F1F0070B627 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "QTFFmpeg/QTFFmpeg-Prefix.pch";
 				INFOPLIST_FILE = "QTFFmpeg/QTFFmpeg-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../FFmpeg/libs/MacOSX/x86_64/lib\"",
+					"\"$(SRCROOT)/../../../FFmpeg/ffmpeg/libavdevice\"",
+					"\"$(SRCROOT)/../../../FFmpeg/ffmpeg/libavfilter\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -582,13 +599,20 @@
 		426CA06916F24F1F0070B627 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "QTFFmpeg/QTFFmpeg-Prefix.pch";
 				INFOPLIST_FILE = "QTFFmpeg/QTFFmpeg-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../FFmpeg/libs/MacOSX/x86_64/lib\"",
+					"\"$(SRCROOT)/../../../FFmpeg/ffmpeg/libavdevice\"",
+					"\"$(SRCROOT)/../../../FFmpeg/ffmpeg/libavfilter\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";

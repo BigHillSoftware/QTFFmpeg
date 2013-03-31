@@ -233,7 +233,7 @@ static NSString * const kBuiltInVideoCamera = @"FaceTime HD Camera (Built-in)";
             [_videoCaptureOutput setPixelBufferAttributes:attributes];
             
             [_videoCaptureOutput setAutomaticallyDropsLateVideoFrames:config.videoCaptureDropLateFrames];
-            [_videoCaptureOutput setMinimumVideoFrameInterval:config.videoCaptureFrameRate];
+            [_videoCaptureOutput setMinimumVideoFrameInterval:config.videoCaptureFrameInterval];
             
             success = [_videoCaptureSession addOutput:_videoCaptureOutput error:error];
             
