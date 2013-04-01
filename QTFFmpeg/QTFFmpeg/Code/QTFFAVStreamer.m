@@ -306,8 +306,8 @@
     audioCodecCtx->sample_fmt = config.audioCodecSampleFormat;
     audioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
     //audioCodecCtx->time_base.den = config.audioCodecSampleRate;
-    //audioCodecCtx->time_base.den = config.videoCodecFrameRate;
-    audioCodecCtx->time_base.den = 15;
+    audioCodecCtx->time_base.den = config.videoCodecFrameRate;
+    //audioCodecCtx->time_base.den = 30;
     audioCodecCtx->time_base.num = 1;
     
     if (avcodec_open2(audioCodecCtx, audioCodec, NULL) < 0)
@@ -371,8 +371,8 @@
     videoCodecCtx->width = config.videoCodecFrameWidth;
     videoCodecCtx->height = config.videoCodecFrameHeight;
     videoCodecCtx->bit_rate = bitRate;
-    //videoCodecCtx->time_base.den = config.videoCodecFrameRate;
-    videoCodecCtx->time_base.den = 15;
+    videoCodecCtx->time_base.den = config.videoCodecFrameRate;
+    //videoCodecCtx->time_base.den = 15;
     videoCodecCtx->time_base.num = 1;
     
     // open the video codec
@@ -648,6 +648,7 @@
                 
                 _avPacket.pts = (((double)(sampleBuffer.presentationTime.timeValue * codecCtx->time_base.den)) / (double)sampleBuffer.presentationTime.timeScale);
                 _avPacket.dts = (((double)(sampleBuffer.decodeTime.timeValue * codecCtx->time_base.den)) / (double)sampleBuffer.decodeTime.timeScale);
+                _avPacket.duration = (((double)(sampleBuffer.duration.timeValue * codecCtx->time_base.den)) / (double)sampleBuffer.duration.timeScale);
                 
                 // encode the audio
                 returnVal = avcodec_encode_audio2(codecCtx, &_avPacket, _streamAudioFrame, &gotPacket);
@@ -680,10 +681,7 @@
                     
                     //QTFFAppLog(@"Audio frame pts: %lld", _avPacket.pts);
                     
-                    //if(_audioStream->codec->coded_frame->key_frame)
-                    //{
                     _avPacket.flags |= AV_PKT_FLAG_KEY;
-                    //}
                     _avPacket.stream_index = _audioStream->index;
                     
                     // write the frame
@@ -822,17 +820,18 @@
                 _avPacket.size = 0;
                 int gotPacket;
                 
-                /*
-                 QTFFAppLog(@"Video frame decode time: %lld", sampleBuffer.decodeTime.timeValue);
-                 QTFFAppLog(@"Video frame decode time scale: %ld", sampleBuffer.decodeTime.timeScale);
-                 QTFFAppLog(@"Video frame presentation time: %lld", sampleBuffer.presentationTime.timeValue);
-                 QTFFAppLog(@"Video frame presentation time scale: %ld", sampleBuffer.presentationTime.timeScale);
-                 QTFFAppLog(@"Video frame duration time: %lld", sampleBuffer.duration.timeValue);
-                 QTFFAppLog(@"Video frame duration time scale: %ld", sampleBuffer.duration.timeScale);
-                 */
+                //QTFFAppLog(@"Video frame decode time: %lld", sampleBuffer.decodeTime.timeValue);
+                //QTFFAppLog(@"Video frame decode time scale: %ld", sampleBuffer.decodeTime.timeScale);
+                //QTFFAppLog(@"Video frame presentation time: %lld", sampleBuffer.presentationTime.timeValue);
+                //QTFFAppLog(@"Video frame presentation time scale: %ld", sampleBuffer.presentationTime.timeScale);
+                //QTFFAppLog(@"Video frame duration time: %lld", sampleBuffer.duration.timeValue);
+                //QTFFAppLog(@"Video frame duration time scale: %ld", sampleBuffer.duration.timeScale);
+                
+                codecCtx->time_base.den = (int)(1.0 / ((double)sampleBuffer.duration.timeValue / (double)sampleBuffer.duration.timeScale));
                 
                 _avPacket.pts = (((double)(sampleBuffer.presentationTime.timeValue * codecCtx->time_base.den)) / (double)sampleBuffer.presentationTime.timeScale);
                 _avPacket.dts = (((double)(sampleBuffer.decodeTime.timeValue * codecCtx->time_base.den)) / (double)sampleBuffer.decodeTime.timeScale);
+                _avPacket.duration = (((double)(sampleBuffer.duration.timeValue * codecCtx->time_base.den)) / (double)sampleBuffer.duration.timeScale);
                 
                 // encoding
                 returnVal = avcodec_encode_video2(codecCtx, &_avPacket, _streamVideoFrame, &gotPacket);
@@ -861,6 +860,7 @@
                     _avPacket.dts = _avPacket.pts;
                     
                     //QTFFAppLog(@"Video frame pts: %lld", _avPacket.pts);
+                    //QTFFAppLog(@"Video frame duration: %d", _avPacket.duration);
                     
                     if(codecCtx->coded_frame->key_frame)
                     {
