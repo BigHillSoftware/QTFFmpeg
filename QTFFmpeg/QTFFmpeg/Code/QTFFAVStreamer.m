@@ -30,6 +30,8 @@
     AVFrame *_streamVideoFrame;
     
     AVPacket _avPacket;
+    
+    int64_t _videoPresentationTime;
 }
 
 @end
@@ -90,6 +92,8 @@
                                 
                                 return NO;
                             }
+                            
+                            _videoPresentationTime = 0;
                         }
                         
                         // create the options dictionary, add the appropriate headers
@@ -305,8 +309,8 @@
     audioCodecCtx->channels = config.audioCodecNumberOfChannels;
     audioCodecCtx->sample_fmt = config.audioCodecSampleFormat;
     audioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
-    //audioCodecCtx->time_base.den = config.audioCodecSampleRate;
-    audioCodecCtx->time_base.den = config.videoCodecFrameRate;
+    audioCodecCtx->time_base.den = config.audioCodecSampleRate;
+    //audioCodecCtx->time_base.den = config.videoCodecFrameRate;
     //audioCodecCtx->time_base.den = 30;
     audioCodecCtx->time_base.num = 1;
     
@@ -646,6 +650,15 @@
                 _avPacket.size = 0;
                 int gotPacket;
                 
+                /*
+                 QTFFAppLog(@"Audio frame decode time: %lld", sampleBuffer.decodeTime.timeValue);
+                 QTFFAppLog(@"Audio frame decode time scale: %ld", sampleBuffer.decodeTime.timeScale);
+                 QTFFAppLog(@"Audio frame presentation time: %lld", sampleBuffer.presentationTime.timeValue);
+                 QTFFAppLog(@"Audio frame presentation time scale: %ld", sampleBuffer.presentationTime.timeScale);
+                 QTFFAppLog(@"Audio frame duration time: %lld", sampleBuffer.duration.timeValue);
+                 QTFFAppLog(@"Audio frame duration time scale: %ld", sampleBuffer.duration.timeScale);
+                 */
+                
                 _avPacket.pts = (((double)(sampleBuffer.presentationTime.timeValue * codecCtx->time_base.den)) / (double)sampleBuffer.presentationTime.timeScale);
                 _avPacket.dts = (((double)(sampleBuffer.decodeTime.timeValue * codecCtx->time_base.den)) / (double)sampleBuffer.decodeTime.timeScale);
                 _avPacket.duration = (((double)(sampleBuffer.duration.timeValue * codecCtx->time_base.den)) / (double)sampleBuffer.duration.timeScale);
@@ -675,6 +688,7 @@
                     if (codecCtx->coded_frame->pts != AV_NOPTS_VALUE)
                     {
                         _avPacket.pts = av_rescale_q(codecCtx->coded_frame->pts, codecCtx->time_base, _audioStream->time_base);
+                        //_avPacket.pts = av_rescale_q(codecCtx->coded_frame->pts, codecCtx->time_base, _videoStream->time_base);
                     }
                     
                     _avPacket.dts = _avPacket.pts;
@@ -815,63 +829,46 @@
                 sws_scale(imgConvertCtx, (const u_int8_t* const*)_inputVideoFrame->data, _inputVideoFrame->linesize,
                           0, codecCtx->height, _streamVideoFrame->data, _streamVideoFrame->linesize);
                 
-                // encode the video frame, fill a packet for streaming
-                _avPacket.data = NULL;
-                _avPacket.size = 0;
-                int gotPacket;
+                /*
+                 QTFFAppLog(@"Video frame decode time: %lld", sampleBuffer.decodeTime.timeValue);
+                 QTFFAppLog(@"Video frame decode time scale: %ld", sampleBuffer.decodeTime.timeScale);
+                 QTFFAppLog(@"Video frame presentation time: %lld", sampleBuffer.presentationTime.timeValue);
+                 QTFFAppLog(@"Video frame presentation time scale: %ld", sampleBuffer.presentationTime.timeScale);
+                 QTFFAppLog(@"Video frame duration time: %lld", sampleBuffer.duration.timeValue);
+                 QTFFAppLog(@"Video frame duration time scale: %ld", sampleBuffer.duration.timeScale);
+                 */
                 
-                //QTFFAppLog(@"Video frame decode time: %lld", sampleBuffer.decodeTime.timeValue);
-                //QTFFAppLog(@"Video frame decode time scale: %ld", sampleBuffer.decodeTime.timeScale);
                 //QTFFAppLog(@"Video frame presentation time: %lld", sampleBuffer.presentationTime.timeValue);
-                //QTFFAppLog(@"Video frame presentation time scale: %ld", sampleBuffer.presentationTime.timeScale);
                 //QTFFAppLog(@"Video frame duration time: %lld", sampleBuffer.duration.timeValue);
-                //QTFFAppLog(@"Video frame duration time scale: %ld", sampleBuffer.duration.timeScale);
                 
-                codecCtx->time_base.den = (int)(1.0 / ((double)sampleBuffer.duration.timeValue / (double)sampleBuffer.duration.timeScale));
+                //codecCtx->time_base.den = (int)(1.0 / ((double)sampleBuffer.duration.timeValue / (double)sampleBuffer.duration.timeScale));
                 
-                _avPacket.pts = (((double)(sampleBuffer.presentationTime.timeValue * codecCtx->time_base.den)) / (double)sampleBuffer.presentationTime.timeScale);
-                _avPacket.dts = (((double)(sampleBuffer.decodeTime.timeValue * codecCtx->time_base.den)) / (double)sampleBuffer.decodeTime.timeScale);
-                _avPacket.duration = (((double)(sampleBuffer.duration.timeValue * codecCtx->time_base.den)) / (double)sampleBuffer.duration.timeScale);
+                //int actualFrameRate = (int)(1.0 / ((double)sampleBuffer.duration.timeValue / (double)sampleBuffer.duration.timeScale));
+                //QTFFAppLog(@"Video frame rate: %d", actualFrameRate);
                 
-                // encoding
-                returnVal = avcodec_encode_video2(codecCtx, &_avPacket, _streamVideoFrame, &gotPacket);
+                double timeBaseUnit = ((double)codecCtx->time_base.num / (double)codecCtx->time_base.den);
                 
-                if (returnVal != 0)
+                int numberOfFramesToBeInserted = (int)(((double)sampleBuffer.duration.timeValue / (double)sampleBuffer.duration.timeScale) / timeBaseUnit);
+                
+                //int64_t presentationTime = (((double)(sampleBuffer.presentationTime.timeValue * codecCtx->time_base.den)) / (double)sampleBuffer.presentationTime.timeScale);
+
+                //_avPacket.pts = (((double)(sampleBuffer.presentationTime.timeValue * codecCtx->time_base.den)) / (double)sampleBuffer.presentationTime.timeScale);
+                //_avPacket.dts = _avPacket.pts;
+                //_avPacket.dts = (((double)(sampleBuffer.decodeTime.timeValue * codecCtx->time_base.den)) / (double)sampleBuffer.decodeTime.timeScale);
+                //_avPacket.duration = (((double)(sampleBuffer.duration.timeValue * codecCtx->time_base.den)) / (double)sampleBuffer.duration.timeScale);
+                                
+                for (int i = 0; i < numberOfFramesToBeInserted; i++)
                 {
-                    if (error)
-                    {
-                        *error = [NSError errorWithDomain:QTFFVideoErrorDomain
-                                                     code:QTFFErrorCode_VideoStreamingError
-                                              description:[NSString stringWithFormat:@"Unable to encode the video frame, error: %d", returnVal]];
-                    }
+                    // encode the video frame, fill a packet for streaming
+                    _avPacket.data = NULL;
+                    _avPacket.size = 0;
+                    int gotPacket;
                     
-                    return NO;
-                }
-                
-                // if a packet was returned, write it to the network stream. The codec may take several calls before returning a packet.
-                // only when there is a full packet returned for streaming should writing be attempted.
-                if (gotPacket == 1)
-                {
-                    if (codecCtx->coded_frame->pts != AV_NOPTS_VALUE)
-                    {
-                        _avPacket.pts = av_rescale_q(codecCtx->coded_frame->pts, codecCtx->time_base, _videoStream->time_base);
-                    }
-                    
+                    _avPacket.pts = ++_videoPresentationTime;
                     _avPacket.dts = _avPacket.pts;
-                    
-                    //QTFFAppLog(@"Video frame pts: %lld", _avPacket.pts);
-                    //QTFFAppLog(@"Video frame duration: %d", _avPacket.duration);
-                    
-                    if(codecCtx->coded_frame->key_frame)
-                    {
-                        _avPacket.flags |= AV_PKT_FLAG_KEY;
-                    }
-                    
-                    _avPacket.stream_index= _videoStream->index;
-                    
-                    // write the frame
-                    //returnVal = av_interleaved_write_frame(_avOutputFormatContext, &avPacket);
-                    returnVal = av_write_frame(_avOutputFormatContext, &_avPacket);
+
+                    // encoding
+                    returnVal = avcodec_encode_video2(codecCtx, &_avPacket, _streamVideoFrame, &gotPacket);
                     
                     if (returnVal != 0)
                     {
@@ -879,11 +876,57 @@
                         {
                             *error = [NSError errorWithDomain:QTFFVideoErrorDomain
                                                          code:QTFFErrorCode_VideoStreamingError
-                                                  description:[NSString stringWithFormat:@"Unable to write the video frame to the stream, error: %d", returnVal]];
+                                                  description:[NSString stringWithFormat:@"Unable to encode the video frame, error: %d", returnVal]];
                         }
                         
                         return NO;
                     }
+                    
+                    // if a packet was returned, write it to the network stream. The codec may take several calls before returning a packet.
+                    // only when there is a full packet returned for streaming should writing be attempted.
+                    if (gotPacket == 1)
+                    {
+                        if (codecCtx->coded_frame->pts != AV_NOPTS_VALUE)
+                        {
+                            _avPacket.pts = av_rescale_q(codecCtx->coded_frame->pts, codecCtx->time_base, _videoStream->time_base);
+                        }
+                        
+                        if (_avPacket.pts == 0)
+                        {
+                            _avPacket.pts = 1;
+                        }
+                        
+                        _avPacket.dts = _avPacket.pts;
+                        
+                        QTFFAppLog(@"Video frame pts: %lld", _avPacket.pts);
+                        
+                        //QTFFAppLog(@"Video frame duration: %d", _avPacket.duration);
+                        
+                        if(codecCtx->coded_frame->key_frame)
+                        {
+                            _avPacket.flags |= AV_PKT_FLAG_KEY;
+                        }
+                        
+                        _avPacket.stream_index= _videoStream->index;
+                        
+                        // write the frame
+                        //returnVal = av_interleaved_write_frame(_avOutputFormatContext, &avPacket);
+                        returnVal = av_write_frame(_avOutputFormatContext, &_avPacket);
+                        
+                        if (returnVal != 0)
+                        {
+                            if (error)
+                            {
+                                *error = [NSError errorWithDomain:QTFFVideoErrorDomain
+                                                             code:QTFFErrorCode_VideoStreamingError
+                                                      description:[NSString stringWithFormat:@"Unable to write the video frame to the stream, error: %d", returnVal]];
+                            }
+                            
+                            return NO;
+                        }
+                    }
+                    
+                    
                 }
                 
                 return YES;

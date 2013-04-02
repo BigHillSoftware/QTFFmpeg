@@ -12,8 +12,8 @@
 #import "NSFileManager+Utils.h"
 
 #define VIDEO_CAPTURE_INCLUDE_INTERNAL_CAMERA                   YES
-#define VIDEO_CAPTURE_DROP_LATE_FRAMES                          NO
-#define VIDEO_CAPTURE_FRAME_RATE                                15.0
+#define VIDEO_CAPTURE_DROP_LATE_FRAMES                          YES
+#define VIDEO_CAPTURE_FRAME_RATE                                30.0
 #define VIDEO_CAPTURE_SET_PIXEL_BUFFER_SIZE                     YES
 #define VIDEO_CAPTURE_PIXEL_BUFFER_WIDTH                        384.0
 #define VIDEO_CAPTURE_PIXEL_BUFFER_HEIGHT                       216.0
@@ -33,7 +33,7 @@
 #define VIDEO_CODEC_PIXEL_FORMAT                                AV_PIX_FMT_YUV420P
 #define VIDEO_CODEC_GOP_SIZE                                    15
 #define VIDEO_CODEC_BIT_RATE_PREFERRED_KBPS                     372
-#define VIDEO_CODEC_FRAME_RATE                                  15
+#define VIDEO_CODEC_FRAME_RATE                                  30
 #define VIDEO_CODEC_FRAME_WIDTH                                 352
 #define VIDEO_CODEC_FRAME_HEIGHT                                264
 
