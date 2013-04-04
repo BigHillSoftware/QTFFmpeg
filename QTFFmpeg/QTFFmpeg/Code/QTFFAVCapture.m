@@ -10,14 +10,8 @@
 #import "QTFFAVConfig.h"
 
 
-static NSString * const kBuiltInVideoCamera = @"FaceTime HD Camera (Built-in)";
-
-
-@interface QTFFAVCapture()
-{
-}
-
-@end
+static NSString * const kBuiltInVideoCamera1 = @"FaceTime HD Camera (Built-in)";
+static NSString * const kBuiltInVideoCamera2 = @"Built-in iSight";
 
 
 @implementation QTFFAVCapture
@@ -172,7 +166,7 @@ static NSString * const kBuiltInVideoCamera = @"FaceTime HD Camera (Built-in)";
 + (BOOL)isBuiltInCameraDevice:(QTCaptureDevice *)device;
 {
     NSString *title = [device localizedDisplayName];
-    return [title isEqualToString:kBuiltInVideoCamera];
+    return [title isEqualToString:kBuiltInVideoCamera1] || [title isEqualToString:kBuiltInVideoCamera2];
 }
 
 #pragma mark - Video Capture
