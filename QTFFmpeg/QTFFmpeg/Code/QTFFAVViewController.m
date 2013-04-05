@@ -666,7 +666,7 @@
         [self streamAudioFrame:sampleBuffer];
     }
     
-    [self performSelector:@selector(updateAudioLevels)];
+    [self performSelectorOnMainThread:@selector(updateAudioLevels) withObject:nil waitUntilDone:NO];
 }
 
 #pragma mark - QTCaptureDecompressedVideoOutputDelegate Methods

@@ -1450,10 +1450,9 @@
 												<int key="NSCellFlags">0</int>
 												<int key="NSCellFlags2">0</int>
 												<reference key="NSControlView" ref="863679833"/>
-												<double key="NSValue">-20</double>
-												<double key="NSMaxValue">20</double>
-												<double key="NSWarningValue">16</double>
-												<double key="NSCriticalValue">19</double>
+												<double key="NSMaxValue">10</double>
+												<double key="NSWarningValue">6</double>
+												<double key="NSCriticalValue">8</double>
 												<int key="NSIndicatorStyle">2</int>
 											</object>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
