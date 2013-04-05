@@ -36,8 +36,6 @@
 
     double _videoTimeBaseUnit;
     int64_t _videoPresentationTime;
-    
-    
 }
 
 @end
@@ -319,7 +317,7 @@
     audioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
     audioCodecCtx->time_base.den = config.audioCodecSampleRate;
     audioCodecCtx->time_base.num = 1;
-    _audioTimeBaseUnit = ((double)audioCodecCtx->time_base.num / (double)audioCodecCtx->time_base.den);
+    //_audioTimeBaseUnit = ((double)audioCodecCtx->time_base.num / (double)audioCodecCtx->time_base.den);
 
     if (avcodec_open2(audioCodecCtx, audioCodec, NULL) < 0)
     {
@@ -664,10 +662,10 @@
                  QTFFAppLog(@"Audio frame duration time scale: %ld", sampleBuffer.duration.timeScale);
                  */
                 
-                int numberOfFramesToBeInserted = (int)(((double)sampleBuffer.duration.timeValue / (double)sampleBuffer.duration.timeScale) / _audioTimeBaseUnit);
+                //int numberOfFramesToBeInserted = (int)(((double)sampleBuffer.duration.timeValue / (double)sampleBuffer.duration.timeScale) / _audioTimeBaseUnit);
                 
-                for (int i = 0; i < numberOfFramesToBeInserted; i++)
-                {
+                //for (int i = 0; i < numberOfFramesToBeInserted; i++)
+                //{
                     
                     // encode the audio
                     returnVal = avcodec_encode_audio2(codecCtx, &_avPacket, _streamAudioFrame, &gotPacket);
@@ -703,7 +701,7 @@
                         
                         _avPacket.dts = _avPacket.pts;
                         
-                        //QTFFAppLog(@"Audio frame pts: %lld", _avPacket.pts);
+                        QTFFAppLog(@"Audio frame pts: %lld", _avPacket.pts);
                         
                         _avPacket.flags |= AV_PKT_FLAG_KEY;
                         _avPacket.stream_index = _audioStream->index;
@@ -727,7 +725,7 @@
                             return NO;
                         }
                     }
-                }
+                //}
                 
                 av_free(sourceData);
                 av_free(destinationData);
