@@ -12,7 +12,7 @@
 #import "NSFileManager+Utils.h"
 
 #define VIDEO_CAPTURE_INCLUDE_INTERNAL_CAMERA                   YES
-#define VIDEO_CAPTURE_DROP_LATE_FRAMES                          YES
+#define VIDEO_CAPTURE_DROP_LATE_FRAMES                          NO
 #define VIDEO_CAPTURE_FRAME_RATE                                30.0
 #define VIDEO_CAPTURE_SET_PIXEL_BUFFER_SIZE                     YES
 #define VIDEO_CAPTURE_PIXEL_BUFFER_WIDTH                        384.0

@@ -154,5 +154,4 @@ NSString * const DirectoryLocationDomain = @"DirectoryLocationDomain";
 	return result;
 }
 
-
 @end
