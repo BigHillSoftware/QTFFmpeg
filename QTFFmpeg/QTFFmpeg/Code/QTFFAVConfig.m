@@ -25,6 +25,8 @@
 
 #define STREAM_OUTPUT_STREAM_TYPE                               QTFFStreamTypeFile
 #define STREAM_OUTPUT_STREAM_NAME                               @"Output.flv"
+//#define STREAM_OUTPUT_STREAM_TYPE                               QTFFStreamTypeNetwork
+//#define STREAM_OUTPUT_STREAM_NAME                               @"rtmp://localhost:8086/live/Output.flv"
 #define STREAM_OUTPUT_FILENAME_EXTENSION                        @"flv"
 #define STREAM_OUTPUT_MIME_TYPE                                 @"video/x-flv"
 
@@ -85,13 +87,29 @@ static QTFFAVConfig *_sharedInstance;
         
         _shouldStreamAudio = SHOULD_STREAM_AUDIO;
         _shouldStreamVideo = SHOULD_STREAM_VIDEO;
+
+        NSString *desktopDirectory;
         
-        //_streamOutputStreamName = STREAM_OUTPUT_STREAM_NAME;
-        NSString *desktopDirectory = [[[NSFileManager alloc] init] desktopDirectory];
-        _streamOutputStreamName = [desktopDirectory stringByAppendingPathComponent:STREAM_OUTPUT_STREAM_NAME];
-        
+        _streamOutputStreamType = STREAM_OUTPUT_STREAM_TYPE;
         _streamOutputFilenameExtension = STREAM_OUTPUT_FILENAME_EXTENSION;
         _streamOutputMIMEType = STREAM_OUTPUT_MIME_TYPE;
+        
+        switch (_streamOutputStreamType)
+        {
+            case QTFFStreamTypeFile:
+                desktopDirectory = [[[NSFileManager alloc] init] desktopDirectory];
+                _streamOutputStreamName = [desktopDirectory stringByAppendingPathComponent:STREAM_OUTPUT_STREAM_NAME];
+                break;
+                
+            case QTFFStreamTypeNetwork:
+                _streamOutputStreamName = STREAM_OUTPUT_STREAM_NAME;
+                break;
+                
+            default:
+                desktopDirectory = [[[NSFileManager alloc] init] desktopDirectory];
+                _streamOutputStreamName = [desktopDirectory stringByAppendingPathComponent:STREAM_OUTPUT_STREAM_NAME];
+                break;
+        }
         
         _videoInputPixelFormat = VIDEO_INPUT_PIXEL_FORMAT;
         
