@@ -695,10 +695,10 @@
                 //NSLog(@"Current audio presentation time: %f", currentCapturedAudioFramePresentationTime);
                 
                 _capturedAudioFramePts += (currentCapturedAudioFramePresentationTime - lastCapturedAudioFramePresentationTime) / _audioTimeBaseUnit;
-                _avPacket.pts += _capturedAudioFramePts;
-                _avPacket.dts = _avPacket.pts;
+                //_avPacket.pts += _capturedAudioFramePts;
+                //_avPacket.dts = _avPacket.pts;
                 
-                NSLog(@"Pre-encoding audio pts: %lld", _capturedAudioFramePts);
+                //NSLog(@"Pre-encoding audio pts: %lld", _capturedAudioFramePts);
                 
                 // encode the audio
                 returnVal = avcodec_encode_audio2(codecCtx, &_avPacket, _streamAudioFrame, &gotPacket);
@@ -725,12 +725,15 @@
 
                     //AVCodecContext *videoCodecCtx = _videoStream->codec;
 
-                    AVCodecContext *videoCodecCtx = _videoStream->codec;
+                    //AVCodecContext *videoCodecCtx = _videoStream->codec;
                     
-                    if (videoCodecCtx->coded_frame->pts != AV_NOPTS_VALUE)
-                    {
-                        _avPacket.pts = av_rescale_q(videoCodecCtx->coded_frame->pts, videoCodecCtx->time_base, _videoStream->time_base);
-                    }
+                    //if (videoCodecCtx->coded_frame->pts != AV_NOPTS_VALUE)
+                    //{
+                        //NSLog(@"Audio coded frame pts: %lld", codecCtx->coded_frame->pts);
+// THIS ONE WORKS LOCALLY                       _avPacket.pts = av_rescale_q(videoCodecCtx->coded_frame->pts, videoCodecCtx->time_base, _videoStream->time_base);
+                          //_avPacket.pts = av_rescale_q(_capturedAudioFramePts, codecCtx->time_base, _audioStream->time_base);
+                        _avPacket.pts = av_rescale_q(_capturedAudioFramePts, codecCtx->time_base, _audioStream->time_base);
+                    //}
 
                     //_avPacket.pts = av_rescale_q(codecCtx->coded_frame->pts, codecCtx->time_base, _videoStream->time_base);
 
@@ -747,8 +750,8 @@
                     QTFFAppLog(@"Pre-writing audio pts: %lld", _avPacket.pts);
                     
                     // write the frame
-                    //returnVal = av_interleaved_write_frame(_avOutputFormatContext, &_avPacket);
-                    returnVal = av_write_frame(_avOutputFormatContext, &_avPacket);
+                    returnVal = av_interleaved_write_frame(_avOutputFormatContext, &_avPacket);
+                    //returnVal = av_write_frame(_avOutputFormatContext, &_avPacket);
                     
                     if (returnVal != 0)
                     {
@@ -932,7 +935,7 @@
                     _avPacket.dts = _avPacket.pts;
                     //_avPacket.dts = 0;
                     
-                    NSLog(@"Pre-encoding video pts: %lld", _capturedVideoFramePts);
+                    //NSLog(@"Pre-encoding video pts: %lld", _capturedVideoFramePts);
                     
                     // set the frame to use
                     AVFrame *theFrame = i < numberOfOldFramesToBeInserted ? _lastStreamVideoFrame : _currentStreamVideoFrame;
@@ -974,8 +977,8 @@
                         QTFFAppLog(@"Pre-writing video pts: %lld", _avPacket.pts);
                         
                         // write the frame
-                        //returnVal = av_interleaved_write_frame(_avOutputFormatContext, &_avPacket);
-                        returnVal = av_write_frame(_avOutputFormatContext, &_avPacket);
+                        returnVal = av_interleaved_write_frame(_avOutputFormatContext, &_avPacket);
+                        //returnVal = av_write_frame(_avOutputFormatContext, &_avPacket);
                         
                         if (returnVal != 0)
                         {
