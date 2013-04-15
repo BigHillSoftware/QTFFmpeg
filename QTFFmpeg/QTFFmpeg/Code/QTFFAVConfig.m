@@ -23,10 +23,10 @@
 #define SHOULD_STREAM_AUDIO                                     YES
 #define SHOULD_STREAM_VIDEO                                     YES
 
-//#define STREAM_OUTPUT_STREAM_TYPE                               QTFFStreamTypeFile
-//#define STREAM_OUTPUT_STREAM_NAME                               @"Output.flv"
-#define STREAM_OUTPUT_STREAM_TYPE                               QTFFStreamTypeNetwork
-#define STREAM_OUTPUT_STREAM_NAME                               @"rtmp://localhost:8086/live/Output.flv"
+#define STREAM_OUTPUT_STREAM_TYPE                               QTFFStreamTypeFile
+#define STREAM_OUTPUT_STREAM_NAME                               @"Output.flv"
+//#define STREAM_OUTPUT_STREAM_TYPE                               QTFFStreamTypeNetwork
+//#define STREAM_OUTPUT_STREAM_NAME                               @"rtmp://localhost:8086/live/Output.flv"
 #define STREAM_OUTPUT_FILENAME_EXTENSION                        @"flv"
 #define STREAM_OUTPUT_MIME_TYPE                                 @"video/x-flv"
 

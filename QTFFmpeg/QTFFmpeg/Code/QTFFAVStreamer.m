@@ -690,15 +690,15 @@
                 
                 double lastCapturedAudioFramePresentationTime = _capturedAudioFramePts * _audioTimeBaseUnit;
                 
-                //NSLog(@"First audio sample buffer presentation time: %f", _firstSampleBufferAudioFramePresentationTime);
-                //NSLog(@"Last audio presentation time: %f", lastCapturedAudioFramePresentationTime);
-                //NSLog(@"Current audio presentation time: %f", currentCapturedAudioFramePresentationTime);
+                //QTFFAppLog(@"First audio sample buffer presentation time: %f", _firstSampleBufferAudioFramePresentationTime);
+                //QTFFAppLog(@"Last audio presentation time: %f", lastCapturedAudioFramePresentationTime);
+                //QTFFAppLog(@"Current audio presentation time: %f", currentCapturedAudioFramePresentationTime);
                 
                 _capturedAudioFramePts += (currentCapturedAudioFramePresentationTime - lastCapturedAudioFramePresentationTime) / _audioTimeBaseUnit;
-                //_avPacket.pts += _capturedAudioFramePts;
-                //_avPacket.dts = _avPacket.pts;
+                _avPacket.pts += _capturedAudioFramePts;
+                _avPacket.dts = _avPacket.pts;
                 
-                //NSLog(@"Pre-encoding audio pts: %lld", _capturedAudioFramePts);
+                //QTFFAppLog(@"Pre-encoding audio pts: %lld", _capturedAudioFramePts);
                 
                 // encode the audio
                 returnVal = avcodec_encode_audio2(codecCtx, &_avPacket, _streamAudioFrame, &gotPacket);
@@ -722,24 +722,11 @@
                 // only when there is a full packet returned for streaming should writing be attempted.
                 if (gotPacket == 1)
                 {
-
-                    //AVCodecContext *videoCodecCtx = _videoStream->codec;
-
-                    //AVCodecContext *videoCodecCtx = _videoStream->codec;
+                    //QTFFAppLog(@"codecCtx->coded_frame->pts = %lld", codecCtx->coded_frame->pts);
                     
-                    //if (videoCodecCtx->coded_frame->pts != AV_NOPTS_VALUE)
-                    //{
-                        //NSLog(@"Audio coded frame pts: %lld", codecCtx->coded_frame->pts);
-// THIS ONE WORKS LOCALLY                       _avPacket.pts = av_rescale_q(videoCodecCtx->coded_frame->pts, videoCodecCtx->time_base, _videoStream->time_base);
-                          //_avPacket.pts = av_rescale_q(_capturedAudioFramePts, codecCtx->time_base, _audioStream->time_base);
-                        _avPacket.pts = av_rescale_q(_capturedAudioFramePts, codecCtx->time_base, _audioStream->time_base);
-                    //}
-
-                    //_avPacket.pts = av_rescale_q(codecCtx->coded_frame->pts, codecCtx->time_base, _videoStream->time_base);
-
                     //if (codecCtx->coded_frame->pts != AV_NOPTS_VALUE)
                     //{
-//                        _avPacket.pts = av_rescale_q(codecCtx->coded_frame->pts, codecCtx->time_base, _audioStream->time_base);
+                        _avPacket.pts = av_rescale_q(_capturedAudioFramePts, codecCtx->time_base, _audioStream->time_base);
                     //}
                     
                     _avPacket.dts = _avPacket.pts;
@@ -747,7 +734,7 @@
                     _avPacket.flags |= AV_PKT_FLAG_KEY;
                     _avPacket.stream_index = _audioStream->index;
                     
-                    QTFFAppLog(@"Pre-writing audio pts: %lld", _avPacket.pts);
+                    //QTFFAppLog(@"Pre-writing audio pts: %lld", _avPacket.pts);
                     
                     // write the frame
                     returnVal = av_interleaved_write_frame(_avOutputFormatContext, &_avPacket);
@@ -768,7 +755,6 @@
                         return NO;
                     }
                 }
-                //}
                 
                 av_free(sourceData);
                 av_free(destinationData);
@@ -908,10 +894,6 @@
                 
                 double lastCapturedVideoFramePresentationTime = _capturedVideoFramePts * _videoTimeBaseUnit;
                 
-                //NSLog(@"First sample buffer presentation time: %f", _firstSampleBufferVideoFramePresentationTime);
-                //NSLog(@"Last presentation time: %f", lastCapturedVideoFramePresentationTime);
-                //NSLog(@"Current presentation time: %f", currentCapturedVideoFramePresentationTime);
-                
                 // calculate old frames to be inserted
                 numberOfOldFramesToBeInserted = MAX(0, (int)((currentCapturedVideoFramePresentationTime - lastCapturedVideoFramePresentationTime) / _videoTimeBaseUnit) - 1);
                 
@@ -921,8 +903,8 @@
                 
                 int totalNumberOfFramesToBeInserted = numberOfOldFramesToBeInserted + numberOfNewFramesToBeInserted;
                 
-                //NSLog(@"Encoding %d old video frames", numberOfOldFramesToBeInserted);
-                //NSLog(@"Encoding %d new video frames", numberOfNewFramesToBeInserted);
+                //QTFFAppLog(@"Encoding %d old video frames", numberOfOldFramesToBeInserted);
+                //QTFFAppLog(@"Encoding %d new video frames", numberOfNewFramesToBeInserted);
                 
                 for (int i = 0; i < totalNumberOfFramesToBeInserted; i++)
                 {
@@ -933,9 +915,8 @@
                     
                     _avPacket.pts = ++_capturedVideoFramePts;
                     _avPacket.dts = _avPacket.pts;
-                    //_avPacket.dts = 0;
                     
-                    //NSLog(@"Pre-encoding video pts: %lld", _capturedVideoFramePts);
+                    //QTFFAppLog(@"Pre-encoding video pts: %lld", _capturedVideoFramePts);
                     
                     // set the frame to use
                     AVFrame *theFrame = i < numberOfOldFramesToBeInserted ? _lastStreamVideoFrame : _currentStreamVideoFrame;
