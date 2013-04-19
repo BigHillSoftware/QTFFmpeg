@@ -31,15 +31,14 @@ echo Configure for armv7 build
 ./configure \
 --cc=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/gcc \
 --as='/usr/local/bin/gas-preprocessor.pl /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/gcc' \
---sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.0.sdk \
+--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk \
 --target-os=darwin \
 --arch=arm \
 --cpu=cortex-a8 \
---extra-cflags='-arch armv7' \
---extra-ldflags='-arch armv7 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.0.sdk' \
+--extra-cflags='-arch armv7 -strict -2' \
+--extra-ldflags='-arch armv7 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk' \
 --prefix=../output/iOS6/armv7 \
 --enable-cross-compile \
-#--enable-libx264 \
 --disable-armv5te \
 --disable-swscale-alpha \
 --disable-doc \
@@ -68,12 +67,10 @@ echo Configure for i386
 --target-os=darwin \
 --arch=i386 \
 --cpu=i386 \
---extra-cflags='-arch i386' \
+--extra-cflags='-arch i386 -strict -2' \
 --extra-ldflags='-arch i386 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk' \
 --prefix=../output/MacOSX/i386 \
 --enable-cross-compile \
-#--enable-libx264 \
---disable-armv5te \
 --disable-swscale-alpha \
 --disable-doc \
 --disable-ffmpeg \
@@ -86,7 +83,7 @@ echo Configure for i386
 # Make
 make clean
 #make
-make && sudo make install
+make && make install
 
 # * BUILD FOR x86_64 *
 
@@ -99,12 +96,10 @@ echo Configure for x86_64
 --target-os=darwin \
 --arch=x86_64 \
 --cpu=x86_64 \
---extra-cflags='-arch x86_64' \
+--extra-cflags='-arch x86_64 -strict -2' \
 --extra-ldflags='-arch x86_64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk' \
 --prefix=../output/MacOSX/x86_64 \
 --enable-cross-compile \
-#--enable-libx264 \
---disable-armv5te \
 --disable-swscale-alpha \
 --disable-doc \
 --disable-ffmpeg \
@@ -117,7 +112,7 @@ echo Configure for x86_64
 # Make
 make clean
 #make
-make && sudo make install
+make && make install
 
 # *** BUILD Universal ***
 

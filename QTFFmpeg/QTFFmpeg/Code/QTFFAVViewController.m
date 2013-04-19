@@ -565,7 +565,7 @@
         
         QTFFAppLog(@"Starting audio streaming to URL: %@", config.streamOutputStreamName);
         
-        QTFormatDescription *formatDescription = ((QTCaptureConnection *)_avCapture.audioCaptureOutput.connections[0]).formatDescription;
+        //QTFormatDescription *formatDescription = ((QTCaptureConnection *)_avCapture.audioCaptureOutput.connections[0]).formatDescription;
         
         _isStreamingAudio = YES;
         

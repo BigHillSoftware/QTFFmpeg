@@ -281,6 +281,8 @@
 {
     // create the audio stream
     _audioStream = nil;
+    
+    /*
     if (_avOutputFormat->audio_codec == CODEC_ID_NONE)
     {
         if (error)
@@ -292,6 +294,9 @@
         
         return NO;
     }
+    */
+
+    _avOutputFormat->audio_codec = CODEC_ID_SPEEX;
     
     const AVCodec *audioCodec = avcodec_find_encoder(_avOutputFormat->audio_codec);
     
@@ -712,10 +717,10 @@
                                               description:[NSString stringWithFormat:@"Unable to encode the audio frame, error: %d", returnVal]];
                     }
                     
-                    return NO;
-                    
                     av_free(sourceData);
                     av_free(destinationData);
+                    
+                    return NO;
                 }
                 
                 // if a packet was returned, write it to the network stream. The codec may take several calls before returning a packet.
@@ -955,7 +960,7 @@
                         
                         _avPacket.stream_index= _videoStream->index;
                         
-                        QTFFAppLog(@"Pre-writing video pts: %lld", _avPacket.pts);
+                        //QTFFAppLog(@"Pre-writing video pts: %lld", _avPacket.pts);
                         
                         // write the frame
                         returnVal = av_interleaved_write_frame(_avOutputFormatContext, &_avPacket);
