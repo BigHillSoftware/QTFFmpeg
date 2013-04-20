@@ -334,6 +334,8 @@
     //audioCodecCtx->time_base.num = 1;
     _audioTimeBaseUnit = ((double)audioCodecCtx->time_base.num / (double)audioCodecCtx->time_base.den);
     audioCodecCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
+    //audioCodecCtx->profile = FF_PROFILE_AAC_LOW;
+    audioCodecCtx->noise_reduction = 5;
     
     if (avcodec_open2(audioCodecCtx, audioCodec, NULL) < 0)
     {
