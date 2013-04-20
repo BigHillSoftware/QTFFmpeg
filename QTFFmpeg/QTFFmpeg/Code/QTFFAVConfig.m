@@ -21,12 +21,12 @@
 #define VIDEO_CAPTURE_PIXEL_BUFFER_FORMAT_TYPE                  kCVPixelFormatType_422YpCbCr8
 
 #define SHOULD_STREAM_AUDIO                                     YES
-#define SHOULD_STREAM_VIDEO                                     YES
+#define SHOULD_STREAM_VIDEO                                     NO
 
-//#define STREAM_OUTPUT_STREAM_TYPE                               QTFFStreamTypeFile
-//#define STREAM_OUTPUT_STREAM_NAME                               @"Output.flv"
-#define STREAM_OUTPUT_STREAM_TYPE                               QTFFStreamTypeNetwork
-#define STREAM_OUTPUT_STREAM_NAME                               @"rtmp://localhost:8086/live/Output.flv"
+#define STREAM_OUTPUT_STREAM_TYPE                               QTFFStreamTypeFile
+#define STREAM_OUTPUT_STREAM_NAME                               @"Output.flv"
+//#define STREAM_OUTPUT_STREAM_TYPE                               QTFFStreamTypeNetwork
+//#define STREAM_OUTPUT_STREAM_NAME                               @"rtmp://localhost:8086/live/Output.flv"
 #define STREAM_OUTPUT_FILENAME_EXTENSION                        @"flv"
 #define STREAM_OUTPUT_MIME_TYPE                                 @"video/x-flv"
 
@@ -48,7 +48,9 @@
 #define AUDIO_CODEC_SAMPLE_RATE                                 44100
 #define AUDIO_CODEC_CHANNEL_LAYOUT                              AV_CH_LAYOUT_STEREO
 #define AUDIO_CODEC_NUMBER_OF_CHANNELS                          2
-#define AUDIO_CODEC_SAMPLE_FORMAT                               AV_SAMPLE_FMT_S16
+
+//#define AUDIO_CODEC_SAMPLE_FORMAT                               AV_SAMPLE_FMT_S16
+#define AUDIO_CODEC_SAMPLE_FORMAT                               AV_SAMPLE_FMT_FLTP
 
 
 static QTFFAVConfig *_sharedInstance;

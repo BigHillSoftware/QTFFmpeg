@@ -36,6 +36,7 @@
 		426CA06416F24F1F0070B627 /* QTFFmpegTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 426CA06316F24F1F0070B627 /* QTFFmpegTests.m */; };
 		427275E116F2851F003DCA16 /* QTFFAVViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 427275E016F2851F003DCA16 /* QTFFAVViewController.m */; };
 		427275E416F28798003DCA16 /* QTFFAVCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 427275E316F28798003DCA16 /* QTFFAVCapture.m */; };
+		427877A01720F4B700083B59 /* libiconv.2.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4278779F1720F4B700083B59 /* libiconv.2.4.0.dylib */; };
 		429AFE17170256C000C17D6B /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 429AFE16170256C000C17D6B /* ApplicationServices.framework */; };
 		42A5840B16F8FD1E00E1AF5A /* NSView+BackgroundColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 42A5840A16F8FD1E00E1AF5A /* NSView+BackgroundColor.m */; };
 		42A5840E16F8FD8F00E1AF5A /* NSColor+Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 42A5840D16F8FD8F00E1AF5A /* NSColor+Utils.m */; };
@@ -85,6 +86,7 @@
 		427275E016F2851F003DCA16 /* QTFFAVViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QTFFAVViewController.m; sourceTree = "<group>"; };
 		427275E216F28798003DCA16 /* QTFFAVCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QTFFAVCapture.h; sourceTree = "<group>"; };
 		427275E316F28798003DCA16 /* QTFFAVCapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QTFFAVCapture.m; sourceTree = "<group>"; };
+		4278779F1720F4B700083B59 /* libiconv.2.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.2.4.0.dylib; path = usr/lib/libiconv.2.4.0.dylib; sourceTree = SDKROOT; };
 		429AFE16170256C000C17D6B /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
 		42A5840916F8FD1E00E1AF5A /* NSView+BackgroundColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSView+BackgroundColor.h"; sourceTree = "<group>"; };
 		42A5840A16F8FD1E00E1AF5A /* NSView+BackgroundColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSView+BackgroundColor.m"; sourceTree = "<group>"; };
@@ -124,6 +126,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				427877A01720F4B700083B59 /* libiconv.2.4.0.dylib in Frameworks */,
 				4227CCEB1702557E00E1D2B3 /* libswscale.a in Frameworks */,
 				4227CCEA1702557A00E1D2B3 /* libswresample.a in Frameworks */,
 				4227CCE91702557700E1D2B3 /* libavutil.a in Frameworks */,
@@ -181,6 +184,7 @@
 		426CA03816F24F1E0070B627 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4278779F1720F4B700083B59 /* libiconv.2.4.0.dylib */,
 				42E2DE6316F26B9F001BB823 /* libz.1.2.5.dylib */,
 				42E2DE6116F26B89001BB823 /* libz.dylib */,
 				42E2DE5F16F26B73001BB823 /* libbz2.1.0.5.dylib */,

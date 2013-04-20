@@ -1,4 +1,4 @@
-*** How to build ffmpeg for iOS 6 and Mac OS X Lion using Xcode 4.5.2 (tested against a 01/22/2013 github checkout) ***
+*** How to build ffmpeg for iOS 6.1 and Mac OS X Lion 10.8 using Xcode 4.6.2 (tested against a 04/18/2013 github checkout) ***
 
 1. Create a new directory of choice to hold all of the files involved in this HOWTO (well call this directory <FFMPEG>).
 

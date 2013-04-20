@@ -296,8 +296,9 @@
     }
     */
 
-    _avOutputFormat->audio_codec = CODEC_ID_SPEEX;
-    
+    _avOutputFormat->audio_codec = AV_CODEC_ID_AAC;
+//    _avOutputFormat->audio_codec = AV_CODEC_ID_MP2;
+
     const AVCodec *audioCodec = avcodec_find_encoder(_avOutputFormat->audio_codec);
     
     QTFFAppLog(@"Audio codec: %s", audioCodec->name);
@@ -332,6 +333,7 @@
     audioCodecCtx->time_base.den = config.audioCodecSampleRate;
     audioCodecCtx->time_base.num = 1;
     _audioTimeBaseUnit = ((double)audioCodecCtx->time_base.num / (double)audioCodecCtx->time_base.den);    
+    audioCodecCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
     
     if (avcodec_open2(audioCodecCtx, audioCodec, NULL) < 0)
     {
@@ -739,7 +741,7 @@
                     _avPacket.flags |= AV_PKT_FLAG_KEY;
                     _avPacket.stream_index = _audioStream->index;
                     
-                    //QTFFAppLog(@"Pre-writing audio pts: %lld", _avPacket.pts);
+                    QTFFAppLog(@"Pre-writing audio pts: %lld", _avPacket.pts);
                     
                     // write the frame
                     returnVal = av_interleaved_write_frame(_avOutputFormatContext, &_avPacket);
@@ -960,7 +962,7 @@
                         
                         _avPacket.stream_index= _videoStream->index;
                         
-                        //QTFFAppLog(@"Pre-writing video pts: %lld", _avPacket.pts);
+                        QTFFAppLog(@"Pre-writing video pts: %lld", _avPacket.pts);
                         
                         // write the frame
                         returnVal = av_interleaved_write_frame(_avOutputFormatContext, &_avPacket);
