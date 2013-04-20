@@ -297,8 +297,6 @@
     */
 
     _avOutputFormat->audio_codec = AV_CODEC_ID_AAC;
-//    _avOutputFormat->audio_codec = AV_CODEC_ID_MP2;
-
     const AVCodec *audioCodec = avcodec_find_encoder(_avOutputFormat->audio_codec);
     
     QTFFAppLog(@"Audio codec: %s", audioCodec->name);
@@ -332,7 +330,9 @@
     audioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
     audioCodecCtx->time_base.den = config.audioCodecSampleRate;
     audioCodecCtx->time_base.num = 1;
-    _audioTimeBaseUnit = ((double)audioCodecCtx->time_base.num / (double)audioCodecCtx->time_base.den);    
+    //audioCodecCtx->time_base.den = 9000;
+    //audioCodecCtx->time_base.num = 1;
+    _audioTimeBaseUnit = ((double)audioCodecCtx->time_base.num / (double)audioCodecCtx->time_base.den);
     audioCodecCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
     
     if (avcodec_open2(audioCodecCtx, audioCodec, NULL) < 0)
@@ -645,6 +645,8 @@
                 _streamAudioFrame->nb_samples = codecCtx->frame_size;
                 _streamAudioFrame->format = codecCtx->sample_fmt;
                 _streamAudioFrame->channel_layout = codecCtx->channel_layout;
+                _streamAudioFrame->channels = codecCtx->channels;
+                _streamAudioFrame->sample_rate = codecCtx->sample_rate;
                 
                 returnVal = avcodec_fill_audio_frame(_streamAudioFrame,
                                                      codecCtx->channels,

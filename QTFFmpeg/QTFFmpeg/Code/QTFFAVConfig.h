@@ -47,9 +47,9 @@ typedef enum
 @property (nonatomic, assign) int videoCodecFrameWidth;
 @property (nonatomic, assign) int videoCodecFrameHeight;
 
-@property (nonatomic, assign) int audioInputSampleRate;
-@property (nonatomic, assign) int audioInputChannelLayout;
-@property (nonatomic, assign) int audioInputNumberOfChannels;
+//@property (nonatomic, assign) int audioInputSampleRate;
+//@property (nonatomic, assign) int audioInputChannelLayout;
+//@property (nonatomic, assign) int audioInputNumberOfChannels;
 @property (nonatomic, assign) enum AVSampleFormat audioInputSampleFormat;
 
 @property (nonatomic, assign) int audioCodecBitRatePreferredKbps;
