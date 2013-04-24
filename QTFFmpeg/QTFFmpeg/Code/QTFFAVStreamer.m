@@ -35,6 +35,7 @@
     double _audioTimeBaseUnit;
     BOOL _hasFirstSampleBufferAudioFrame;
     double _firstSampleBufferAudioFramePresentationTime;
+    double _lastCapturedAudioFramePresentationTime;
     int64_t _capturedAudioFramePts;
     
     double _videoTimeBaseUnit;
@@ -283,19 +284,19 @@
     _audioStream = nil;
     
     /*
-    if (_avOutputFormat->audio_codec == CODEC_ID_NONE)
-    {
-        if (error)
-        {
-            *error = [NSError errorWithDomain:QTFFVideoErrorDomain
-                                         code:QTFFErrorCode_VideoStreamingError
-                                  description:@"Unable to create a new audio stream, required codec unknown."];
-        }
-        
-        return NO;
-    }
-    */
-
+     if (_avOutputFormat->audio_codec == CODEC_ID_NONE)
+     {
+     if (error)
+     {
+     *error = [NSError errorWithDomain:QTFFVideoErrorDomain
+     code:QTFFErrorCode_VideoStreamingError
+     description:@"Unable to create a new audio stream, required codec unknown."];
+     }
+     
+     return NO;
+     }
+     */
+    
     _avOutputFormat->audio_codec = AV_CODEC_ID_AAC;
     const AVCodec *audioCodec = avcodec_find_encoder(_avOutputFormat->audio_codec);
     
@@ -321,21 +322,20 @@
     QTFFAVConfig *config = [QTFFAVConfig sharedConfig];
     
     // set codec settings
+    audioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
+    
     int bitRate = config.audioCodecBitRatePreferredKbps * 1000;
     audioCodecCtx->bit_rate = bitRate;
+    
     audioCodecCtx->sample_rate = config.audioCodecSampleRate;
-    audioCodecCtx->channel_layout = config.audioCodecChannelLayout;
     audioCodecCtx->channels = config.audioCodecNumberOfChannels;
+    audioCodecCtx->channel_layout = av_get_default_channel_layout(config.audioCodecNumberOfChannels);
+    //audioCodecCtx->channel_layout = config.audioCodecChannelLayout;
     audioCodecCtx->sample_fmt = config.audioCodecSampleFormat;
-    audioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
     audioCodecCtx->time_base.den = config.audioCodecSampleRate;
     audioCodecCtx->time_base.num = 1;
-    //audioCodecCtx->time_base.den = 9000;
-    //audioCodecCtx->time_base.num = 1;
     _audioTimeBaseUnit = ((double)audioCodecCtx->time_base.num / (double)audioCodecCtx->time_base.den);
     audioCodecCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
-    //audioCodecCtx->profile = FF_PROFILE_AAC_LOW;
-    audioCodecCtx->noise_reduction = 5;
     
     if (avcodec_open2(audioCodecCtx, audioCodec, NULL) < 0)
     {
@@ -348,6 +348,8 @@
         
         return NO;
     }
+    
+    QTFFAppLog(@"Audio codec frame size: %d", audioCodecCtx->frame_size);
     
     // initialize the output audio frame
     _streamAudioFrame = avcodec_alloc_frame();
@@ -498,25 +500,31 @@
                 // get the codec context
                 AVCodecContext *codecCtx = _audioStream->codec;
                 
-                //QTFFAppLog(@"%@", sampleBuffer.formatDescription.localizedFormatSummary);
-                //QTFFAppLog(@"Bytes per frame:  %d", sampleBuffer.bytesPerFrame);
-                //QTFFAppLog(@"Frames per packet:  %d", sampleBuffer.framesPerPacket);
-                //QTFFAppLog(@"Is packed? %@", sampleBuffer.isPacked ? @"YES" : @"NO");
-                //QTFFAppLog(@"Is high aligned? %@", sampleBuffer.isAlignedHigh ? @"YES" : @"NO");
+                /*
+                 QTFFAppLog(@"%@", sampleBuffer.formatDescription.localizedFormatSummary);
+                 QTFFAppLog(@"Bytes per frame:  %d", sampleBuffer.bytesPerFrame);
+                 QTFFAppLog(@"Frames per packet:  %d", sampleBuffer.framesPerPacket);
+                 QTFFAppLog(@"Bits per channel: %d", sampleBuffer.bitsPerChannel);
+                 QTFFAppLog(@"Is packed? %@", sampleBuffer.isPacked ? @"YES" : @"NO");
+                 QTFFAppLog(@"Is high aligned? %@", sampleBuffer.isAlignedHigh ? @"YES" : @"NO");
+                 QTFFAppLog(@"Channels per frame: %d", sampleBuffer.channelsPerFrame);
+                 */
                 
+                // source data variables
                 int sourceNumberOfChannels = sampleBuffer.channelsPerFrame;
                 int64_t sourceChannelLayout = av_get_default_channel_layout(sourceNumberOfChannels);
                 int sourceSampleRate = sampleBuffer.sampleRate;
                 enum AVSampleFormat sourceSampleFormat = config.audioInputSampleFormat;
-                int sourceLineSize = 0;
                 int sourceNumberOfSamples = (int)(sampleBuffer.numberOfSamples);
+                int sourceLineSize = 0;
                 uint8_t **sourceData = NULL;
                 
-                // destination variables
+                // destination data variables
+                int destinationNumberOfChannels = codecCtx->channels;
                 int64_t destinationChannelLayout = codecCtx->channel_layout;
                 int destinationSampleRate = codecCtx->sample_rate;
                 enum AVSampleFormat destinationSampleFormat = codecCtx->sample_fmt;
-                int destinationNumberOfChannels = codecCtx->channels;
+                int destinationNumberOfSamples = codecCtx->frame_size;
                 int destinationLineSize = 0;
                 uint8_t **destinationData = NULL;
                 
@@ -564,12 +572,12 @@
                 }
                 
                 // allocate the source samples buffer
-                returnVal = alloc_samples_array_and_data(&sourceData,
-                                                         &sourceLineSize,
-                                                         sourceNumberOfChannels,
-                                                         sourceNumberOfSamples,
-                                                         sourceSampleFormat,
-                                                         0);
+                returnVal = av_samples_alloc_array_and_samples(&sourceData,
+                                                               &sourceLineSize,
+                                                               sourceNumberOfChannels,
+                                                               sourceNumberOfSamples,
+                                                               sourceSampleFormat,
+                                                               0);
                 
                 if (returnVal < 0)
                 {
@@ -585,17 +593,16 @@
                 }
                 
                 /* compute destination number of samples */
-                int destinationNumberOfSamples = (int)av_rescale_rnd(swr_get_delay(resamplerCtx, sourceSampleRate) +
-                                                                     sourceNumberOfSamples, destinationSampleRate, sourceSampleRate, AV_ROUND_UP);
+                //int destinationNumberOfSamples = (int)av_rescale_rnd(swr_get_delay(resamplerCtx, sourceSampleRate) + sourceNumberOfSamples, destinationSampleRate, sourceSampleRate, AV_ROUND_UP);
                 
                 // allocate the destination samples buffer
-                returnVal = alloc_samples_array_and_data(&destinationData,
-                                                         &destinationLineSize,
-                                                         destinationNumberOfChannels,
-                                                         destinationNumberOfSamples,
-                                                         destinationSampleFormat,
-                                                         0);
-                
+                returnVal = av_samples_alloc_array_and_samples(&destinationData,
+                                                               &destinationLineSize,
+                                                               destinationNumberOfChannels,
+                                                               destinationNumberOfSamples,
+                                                               destinationSampleFormat,
+                                                               0);
+                                
                 if (returnVal < 0)
                 {
                     if (error)
@@ -613,8 +620,17 @@
                 
                 // assign source data
                 AudioBufferList *tempAudioBufferList = [sampleBuffer audioBufferListWithOptions:0];
-                sourceData[0] = tempAudioBufferList->mBuffers[0].mData;
-                sourceData[1] = tempAudioBufferList->mBuffers[1].mData;
+                
+                for (uint i = 0; i < tempAudioBufferList->mNumberBuffers; i++)
+                {
+                    /*
+                     QTFFAppLog(@"Assigning buffer #: %d", i);
+                     QTFFAppLog(@"Buffer %d has channels: %d", i, tempAudioBufferList->mBuffers[i].mNumberChannels);
+                     QTFFAppLog(@"Buffer %d has data byte size: %d", i, tempAudioBufferList->mBuffers[i].mDataByteSize);
+                     */
+                    sourceData[i] = tempAudioBufferList->mBuffers[i].mData;
+                    
+                }
                 
                 // convert to destination format
                 returnVal = swr_convert(resamplerCtx,
@@ -643,17 +659,36 @@
                                                             destinationSampleFormat,
                                                             0);
                 
-                codecCtx->frame_size = (int)sampleBuffer.numberOfSamples;
                 _streamAudioFrame->nb_samples = codecCtx->frame_size;
                 _streamAudioFrame->format = codecCtx->sample_fmt;
                 _streamAudioFrame->channel_layout = codecCtx->channel_layout;
                 _streamAudioFrame->channels = codecCtx->channels;
                 _streamAudioFrame->sample_rate = codecCtx->sample_rate;
                 
+                /*
+                 QTFFAppLog(@"Source number of channels: %d", sourceNumberOfChannels);
+                 QTFFAppLog(@"Destination number of channels: %d", destinationNumberOfChannels);
+                 QTFFAppLog(@"_streamAudioFrame->channels = %d", _streamAudioFrame->channels);
+                 QTFFAppLog(@"Source channel layout: %lld", sourceChannelLayout);
+                 QTFFAppLog(@"Destination channel layout: %lld", destinationChannelLayout);
+                 QTFFAppLog(@"_streamAudioFrame->channel_layout = %lld", _streamAudioFrame->channel_layout);
+                 QTFFAppLog(@"Source sample format: %d", sourceSampleFormat);
+                 QTFFAppLog(@"Destination sample format: %d", destinationSampleFormat);
+                 QTFFAppLog(@"_streamAudioFrame->format = %d", _streamAudioFrame->format);
+                 QTFFAppLog(@"Source sample rate: %d", sourceSampleRate);
+                 QTFFAppLog(@"Destination sample rate: %d", destinationSampleRate);
+                 QTFFAppLog(@"_streamAudioFrame->sample_rate = %d", _streamAudioFrame->sample_rate);
+                 QTFFAppLog(@"Source line size: %d", sourceLineSize);
+                 QTFFAppLog(@"Destination line size: %d", destinationLineSize);
+                 QTFFAppLog(@"Source number of samples: %d", sourceNumberOfSamples);
+                 QTFFAppLog(@"Destination number of samples: %d", destinationNumberOfSamples);
+                 QTFFAppLog(@"_streamAudioFrame->nb_samples = %d", _streamAudioFrame->nb_samples);
+                 */
+                
                 returnVal = avcodec_fill_audio_frame(_streamAudioFrame,
-                                                     codecCtx->channels,
-                                                     codecCtx->sample_fmt,
-                                                     (const uint8_t*)destinationData[0],
+                                                     _streamAudioFrame->channels,
+                                                     _streamAudioFrame->format,
+                                                     (const uint8_t *)destinationData[0],
                                                      bufferSize,
                                                      0);
                 
@@ -677,12 +712,14 @@
                 _avPacket.size = 0;
                 int gotPacket;
                 
-                 //QTFFAppLog(@"Audio frame decode time: %lld", sampleBuffer.decodeTime.timeValue);
-                 //QTFFAppLog(@"Audio frame decode time scale: %ld", sampleBuffer.decodeTime.timeScale);
-                 //QTFFAppLog(@"Audio frame presentation time: %lld", sampleBuffer.presentationTime.timeValue);
-                 //QTFFAppLog(@"Audio frame presentation time scale: %ld", sampleBuffer.presentationTime.timeScale);
-                 //QTFFAppLog(@"Audio frame duration time: %lld", sampleBuffer.duration.timeValue);
-                 //QTFFAppLog(@"Audio frame duration time scale: %ld", sampleBuffer.duration.timeScale);
+                /*
+                 QTFFAppLog(@"Audio frame decode time: %lld", sampleBuffer.decodeTime.timeValue);
+                 QTFFAppLog(@"Audio frame decode time scale: %ld", sampleBuffer.decodeTime.timeScale);
+                 QTFFAppLog(@"Audio frame presentation time: %lld", sampleBuffer.presentationTime.timeValue);
+                 QTFFAppLog(@"Audio frame presentation time scale: %ld", sampleBuffer.presentationTime.timeScale);
+                 QTFFAppLog(@"Audio frame duration time: %lld", sampleBuffer.duration.timeValue);
+                 QTFFAppLog(@"Audio frame duration time scale: %ld", sampleBuffer.duration.timeScale);
+                 */
                 
                 // calcuate the pts from last pts to the current presentation time
                 
@@ -693,20 +730,23 @@
                 {
                     _hasFirstSampleBufferAudioFrame = YES;
                     _firstSampleBufferAudioFramePresentationTime = (double)sampleBuffer.presentationTime.timeValue / (double)sampleBuffer.presentationTime.timeScale;
+                    _capturedAudioFramePts = 0;
                 }
                 else
                 {
                     currentCapturedAudioFramePresentationTime = ((double)sampleBuffer.presentationTime.timeValue / (double)sampleBuffer.presentationTime.timeScale) - _firstSampleBufferAudioFramePresentationTime;
+                    _capturedAudioFramePts += (currentCapturedAudioFramePresentationTime - _lastCapturedAudioFramePresentationTime) / _audioTimeBaseUnit;
                 }
                 
-                double lastCapturedAudioFramePresentationTime = _capturedAudioFramePts * _audioTimeBaseUnit;
+                /*
+                 QTFFAppLog(@"First audio sample buffer presentation time: %f", _firstSampleBufferAudioFramePresentationTime);
+                 QTFFAppLog(@"Last audio presentation time: %f", _lastCapturedAudioFramePresentationTime);
+                 QTFFAppLog(@"Current audio presentation time: %f", currentCapturedAudioFramePresentationTime);
+                 */
                 
-                //QTFFAppLog(@"First audio sample buffer presentation time: %f", _firstSampleBufferAudioFramePresentationTime);
-                //QTFFAppLog(@"Last audio presentation time: %f", lastCapturedAudioFramePresentationTime);
-                //QTFFAppLog(@"Current audio presentation time: %f", currentCapturedAudioFramePresentationTime);
+                _lastCapturedAudioFramePresentationTime = currentCapturedAudioFramePresentationTime;
                 
-                _capturedAudioFramePts += (currentCapturedAudioFramePresentationTime - lastCapturedAudioFramePresentationTime) / _audioTimeBaseUnit;
-                _avPacket.pts += _capturedAudioFramePts;
+                _avPacket.pts = _capturedAudioFramePts;
                 _avPacket.dts = _avPacket.pts;
                 
                 //QTFFAppLog(@"Pre-encoding audio pts: %lld", _capturedAudioFramePts);
@@ -733,19 +773,13 @@
                 // only when there is a full packet returned for streaming should writing be attempted.
                 if (gotPacket == 1)
                 {
-                    //QTFFAppLog(@"codecCtx->coded_frame->pts = %lld", codecCtx->coded_frame->pts);
-                    
-                    //if (codecCtx->coded_frame->pts != AV_NOPTS_VALUE)
-                    //{
-                        _avPacket.pts = av_rescale_q(_capturedAudioFramePts, codecCtx->time_base, _audioStream->time_base);
-                    //}
-                    
+                    _avPacket.pts = av_rescale_q(_capturedAudioFramePts, codecCtx->time_base, _audioStream->time_base);
                     _avPacket.dts = _avPacket.pts;
+                    
+                    //QTFFAppLog(@"Pre-writing audio pts: %lld", _avPacket.pts);
                     
                     _avPacket.flags |= AV_PKT_FLAG_KEY;
                     _avPacket.stream_index = _audioStream->index;
-                    
-                    QTFFAppLog(@"Pre-writing audio pts: %lld", _avPacket.pts);
                     
                     // write the frame
                     returnVal = av_interleaved_write_frame(_avOutputFormatContext, &_avPacket);
@@ -1046,22 +1080,5 @@
     
     return frame;
 }
-
-int alloc_samples_array_and_data(uint8_t ***data,
-                                 int *linesize,
-                                 int nb_channels,
-                                 int nb_samples,
-                                 enum AVSampleFormat sample_fmt,
-                                 int align)
-{
-    int nb_planes = av_sample_fmt_is_planar(sample_fmt) ? nb_channels : 1;
-    
-    *data = av_malloc(sizeof(*data) * nb_planes);
-    if (!*data)
-        return AVERROR(ENOMEM);
-    return av_samples_alloc(*data, linesize, nb_channels,
-                            nb_samples, sample_fmt, align);
-}
-
 
 @end

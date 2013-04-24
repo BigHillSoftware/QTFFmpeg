@@ -48,7 +48,7 @@
 #define AUDIO_CODEC_BIT_RATE_PREFERRED_KBPS                     128
 //#define AUDIO_CODEC_SAMPLE_RATE                                 44100
 #define AUDIO_CODEC_SAMPLE_RATE                                 96000
-#define AUDIO_CODEC_CHANNEL_LAYOUT                              AV_CH_LAYOUT_STEREO
+//#define AUDIO_CODEC_CHANNEL_LAYOUT                              AV_CH_LAYOUT_STEREO
 #define AUDIO_CODEC_NUMBER_OF_CHANNELS                          2
 
 //#define AUDIO_CODEC_SAMPLE_FORMAT                               AV_SAMPLE_FMT_S16
@@ -131,7 +131,7 @@ static QTFFAVConfig *_sharedInstance;
         
         _audioCodecBitRatePreferredKbps = AUDIO_CODEC_BIT_RATE_PREFERRED_KBPS;
         _audioCodecSampleRate = AUDIO_CODEC_SAMPLE_RATE;
-        _audioCodecChannelLayout = AUDIO_CODEC_CHANNEL_LAYOUT;
+        //_audioCodecChannelLayout = AUDIO_CODEC_CHANNEL_LAYOUT;
         _audioCodecNumberOfChannels = AUDIO_CODEC_NUMBER_OF_CHANNELS;
         _audioCodecSampleFormat = AUDIO_CODEC_SAMPLE_FORMAT;
     }

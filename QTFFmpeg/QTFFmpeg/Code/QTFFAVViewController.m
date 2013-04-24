@@ -125,7 +125,7 @@
             
             for (QTFormatDescription *description in formatDescriptions)
             {
-                NSLog(@"      ∙ %@", [description localizedFormatSummary]);
+                QTFFAppLog(@"      ∙ %@", [description localizedFormatSummary]);
             }
             
             deviceCount++;
@@ -194,7 +194,7 @@
             
             for (QTFormatDescription *description in formatDescriptions)
             {
-                NSLog(@"      ∙ %@", [description localizedFormatSummary]);
+                QTFFAppLog(@"      ∙ %@", [description localizedFormatSummary]);
             }
             
             deviceCount++;

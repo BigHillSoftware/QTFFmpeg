@@ -54,7 +54,7 @@ typedef enum
 
 @property (nonatomic, assign) int audioCodecBitRatePreferredKbps;
 @property (nonatomic, assign) int audioCodecSampleRate;
-@property (nonatomic, assign) int audioCodecChannelLayout;
+//@property (nonatomic, assign) int audioCodecChannelLayout;
 @property (nonatomic, assign) int audioCodecNumberOfChannels;
 @property (nonatomic, assign) enum AVSampleFormat audioCodecSampleFormat;
 
