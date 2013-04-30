@@ -9,6 +9,6 @@ Version: 55.3.100
 Requires: libavutil = 52.27.100
 Requires.private: 
 Conflicts:
-Libs: -L${libdir} -lavcodec -liconv -lm -lbz2 -lz
+Libs: -L${libdir} -lavcodec -liconv -lmp3lame -lm -lbz2 -lz
 Libs.private: 
 Cflags: -I${includedir}

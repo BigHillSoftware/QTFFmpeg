@@ -9,6 +9,6 @@ Version: 55.0.100
 Requires: libavfilter = 3.58.100, libavformat = 55.3.100
 Requires.private: 
 Conflicts:
-Libs: -L${libdir} -lavdevice -liconv -lm -lbz2 -lz
+Libs: -L${libdir} -lavdevice -liconv -lmp3lame -lm -lbz2 -lz
 Libs.private: 
 Cflags: -I${includedir}

@@ -26,6 +26,7 @@
 		4227CCEC170255EB00E1D2B3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 426CA03E16F24F1E0070B627 /* Foundation.framework */; };
 		4227CCED170255EE00E1D2B3 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 426CA03D16F24F1E0070B627 /* CoreData.framework */; };
 		4227CCEE170255F400E1D2B3 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 426CA03C16F24F1E0070B627 /* AppKit.framework */; };
+		42459948172CD9FA0043E3BF /* libmp3lame.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42459947172CD9FA0043E3BF /* libmp3lame.a */; };
 		424D5BB3170201D800571C75 /* QTSampleBuffer+Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 424D5BB2170201D800571C75 /* QTSampleBuffer+Utils.m */; };
 		4257386016F8F7CD00CEE303 /* QTFFAVConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4257385F16F8F7CD00CEE303 /* QTFFAVConfig.m */; };
 		426CA04616F24F1E0070B627 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 426CA04516F24F1E0070B627 /* main.m */; };
@@ -59,6 +60,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		42459947172CD9FA0043E3BF /* libmp3lame.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmp3lame.a; path = ../libmp3lame/libmp3lame.a; sourceTree = "<group>"; };
 		424D5BB1170201D800571C75 /* QTSampleBuffer+Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "QTSampleBuffer+Utils.h"; sourceTree = "<group>"; };
 		424D5BB2170201D800571C75 /* QTSampleBuffer+Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "QTSampleBuffer+Utils.m"; sourceTree = "<group>"; };
 		4257385E16F8F7CD00CEE303 /* QTFFAVConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QTFFAVConfig.h; sourceTree = "<group>"; };
@@ -126,6 +128,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				42459948172CD9FA0043E3BF /* libmp3lame.a in Frameworks */,
 				427877A01720F4B700083B59 /* libiconv.2.4.0.dylib in Frameworks */,
 				4227CCEB1702557E00E1D2B3 /* libswscale.a in Frameworks */,
 				4227CCEA1702557A00E1D2B3 /* libswresample.a in Frameworks */,
@@ -283,6 +286,7 @@
 		42E2DE4F16F264CB001BB823 /* FFmpeg libs */ = {
 			isa = PBXGroup;
 			children = (
+				42459947172CD9FA0043E3BF /* libmp3lame.a */,
 				42E2DE4116F264A8001BB823 /* libavcodec.a */,
 				42E2DE4216F264A8001BB823 /* libavdevice.a */,
 				42E2DE4316F264A8001BB823 /* libavfilter.a */,
@@ -592,6 +596,7 @@
 					"\"$(SRCROOT)/../FFmpeg/libs/MacOSX/x86_64/lib\"",
 					"\"$(SRCROOT)/../../../FFmpeg/ffmpeg/libavdevice\"",
 					"\"$(SRCROOT)/../../../FFmpeg/ffmpeg/libavfilter\"",
+					"\"$(SRCROOT)/../libmp3lame\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -617,6 +622,7 @@
 					"\"$(SRCROOT)/../FFmpeg/libs/MacOSX/x86_64/lib\"",
 					"\"$(SRCROOT)/../../../FFmpeg/ffmpeg/libavdevice\"",
 					"\"$(SRCROOT)/../../../FFmpeg/ffmpeg/libavfilter\"",
+					"\"$(SRCROOT)/../libmp3lame\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";

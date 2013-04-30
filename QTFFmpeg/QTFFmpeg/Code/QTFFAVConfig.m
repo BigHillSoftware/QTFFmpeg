@@ -21,7 +21,7 @@
 #define VIDEO_CAPTURE_PIXEL_BUFFER_FORMAT_TYPE                  kCVPixelFormatType_422YpCbCr8
 
 #define SHOULD_STREAM_AUDIO                                     YES
-#define SHOULD_STREAM_VIDEO                                     NO
+#define SHOULD_STREAM_VIDEO                                     YES
 
 #define STREAM_OUTPUT_STREAM_TYPE                               QTFFStreamTypeFile
 #define STREAM_OUTPUT_STREAM_NAME                               @"Output.flv"
@@ -44,15 +44,20 @@
 //#define AUDIO_INPUT_CHANNEL_LAYOUT                              AV_CH_LAYOUT_STEREO
 //#define AUDIO_INPUT_NUMBER_OF_CHANNELS                          2
 #define AUDIO_INPUT_SAMPLE_FORMAT                               AV_SAMPLE_FMT_FLTP
+//#define AUDIO_INPUT_SAMPLE_FORMAT                               AV_SAMPLE_FMT_FLT
 
+//#define AUDIO_CODEC_ID                                          AV_CODEC_ID_AAC
+#define AUDIO_CODEC_ID                                          AV_CODEC_ID_MP3
 #define AUDIO_CODEC_BIT_RATE_PREFERRED_KBPS                     128
-//#define AUDIO_CODEC_SAMPLE_RATE                                 44100
-#define AUDIO_CODEC_SAMPLE_RATE                                 96000
+//#define AUDIO_CODEC_BIT_RATE_PREFERRED_KBPS                     192
+#define AUDIO_CODEC_SAMPLE_RATE                                 44100
+//#define AUDIO_CODEC_SAMPLE_RATE                                 96000
 //#define AUDIO_CODEC_CHANNEL_LAYOUT                              AV_CH_LAYOUT_STEREO
 #define AUDIO_CODEC_NUMBER_OF_CHANNELS                          2
 
-//#define AUDIO_CODEC_SAMPLE_FORMAT                               AV_SAMPLE_FMT_S16
+//#define AUDIO_CODEC_SAMPLE_FORMAT                               AV_SAMPLE_FMT_FLT
 #define AUDIO_CODEC_SAMPLE_FORMAT                               AV_SAMPLE_FMT_FLTP
+//#define AUDIO_CODEC_SAMPLE_FORMAT                               AV_SAMPLE_FMT_S16P
 
 
 static QTFFAVConfig *_sharedInstance;
@@ -129,6 +134,7 @@ static QTFFAVConfig *_sharedInstance;
         //_audioInputNumberOfChannels = AUDIO_INPUT_NUMBER_OF_CHANNELS;
         _audioInputSampleFormat = AUDIO_INPUT_SAMPLE_FORMAT;
         
+        _audioCodecID = AUDIO_CODEC_ID;
         _audioCodecBitRatePreferredKbps = AUDIO_CODEC_BIT_RATE_PREFERRED_KBPS;
         _audioCodecSampleRate = AUDIO_CODEC_SAMPLE_RATE;
         //_audioCodecChannelLayout = AUDIO_CODEC_CHANNEL_LAYOUT;

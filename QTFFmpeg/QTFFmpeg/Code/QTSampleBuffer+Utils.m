@@ -110,7 +110,7 @@
 
 - (BOOL)isUnsignedInteger;
 {
-    return ! self.isSignedInteger;
+    return ! (self.isFloat || self.isSignedInteger);
 }
 
 @end
