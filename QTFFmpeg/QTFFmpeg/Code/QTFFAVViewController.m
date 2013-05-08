@@ -29,8 +29,6 @@
     // state
     BOOL _isCapturingVideo;
     BOOL _isCapturingAudio;
-    BOOL _isStreamingVideo;
-    BOOL _isStreamingAudio;
     BOOL _isStreaming;
 }
 
@@ -57,8 +55,6 @@
 {
     _isCapturingVideo = NO;
     _isCapturingAudio = NO;
-    _isStreamingVideo = NO;
-    _isStreamingAudio = NO;
     _isStreaming = NO;
     
     // create the capture object
@@ -371,80 +367,23 @@
 
 #pragma mark - Video streaming
 
-- (BOOL)startVideoStreaming;
-{
-    if (! _isStreamingVideo)
-    {
-        // get the config
-        QTFFAVConfig *config = [QTFFAVConfig sharedConfig];
-        
-        // start the stream
-        QTFFAppLog(@"Starting video streaming to URL: %@", config.streamOutputStreamName);
-        
-        NSError *error = nil;
-        BOOL success = [_avStreamer openStream:&error];
-        
-        if (success)
-        {
-            QTFFAppLog(@"Video streaming started successfully.");
-            _isStreamingVideo = YES;
-            return YES;
-        }
-        else
-        {
-            QTFFAppLog(@"Video streaming starting failed with error: %@", [error localizedDescription]);
-            _isStreamingVideo = NO;
-            return NO;
-        }
-    }
-    
-    return YES;
-}
-
 - (void)streamVideoFrame:(CVImageBufferRef)videoFrame
             sampleBuffer:(QTSampleBuffer *)sampleBuffer;
 {
-    if (_isStreamingVideo)
-    {
-        NSError *error = nil;
-        
-        BOOL success = [_avStreamer streamVideoFrame:videoFrame
-                                        sampleBuffer:sampleBuffer
-                                               error:&error];
-        
-        if (success)
-        {
-            //QTFFAppLog(@"Frame streaming succeeded.");
-        }
-        else
-        {
-            QTFFAppLog(@"Frame streaming failed with error: %@", [error localizedDescription]);
-        }
-    }
-}
-
-- (BOOL)stopVideoStreaming;
-{
-    if (_isStreamingVideo)
-    {
-        NSError *error = nil;
-        BOOL success = [_avStreamer closeStream:&error];
-        
-        if (success)
-        {
-            QTFFAppLog(@"Video streaming closed successfully.");
-            _isStreamingVideo = NO;
-            return YES;
-        }
-        else
-        {
-            QTFFAppLog(@"Video streaming closing failed with error: %@", [error localizedDescription]);
-            _isStreamingVideo = NO;
-            return NO;
-        }
-    }
+    NSError *error = nil;
     
-    return YES;
+    BOOL success = [_avStreamer streamVideoFrame:videoFrame
+                                    sampleBuffer:sampleBuffer
+                                           error:&error];
+    
+    if (success)
+    {
+        //QTFFAppLog(@"Frame streaming succeeded.");
+    }
+    else
+    {
+        QTFFAppLog(@"Video frame streaming failed with error: %@", [error localizedDescription]);
+    }
 }
 
 #pragma mark - Audio capture
@@ -556,67 +495,20 @@
 
 #pragma mark - Audio Streaming
 
-- (BOOL)startAudioStreaming;
-{
-    if (! _isStreamingAudio)
-    {
-        // get the config
-        QTFFAVConfig *config = [QTFFAVConfig sharedConfig];
-        
-        QTFFAppLog(@"Starting audio streaming to URL: %@", config.streamOutputStreamName);
-        
-        //QTFormatDescription *formatDescription = ((QTCaptureConnection *)_avCapture.audioCaptureOutput.connections[0]).formatDescription;
-        
-        _isStreamingAudio = YES;
-        
-        QTFFAppLog(@"Audio streaming started successfully.");
-    }
-    
-    return YES;
-}
-
 - (void)streamAudioFrame:(QTSampleBuffer *)sampleBuffer;
 {
-    if (_isStreamingAudio)
-    {
-        NSError *error = nil;
-        
-        BOOL success = [_avStreamer streamAudioFrame:sampleBuffer error:&error];
-        
-        if (success)
-        {
-            //QTFFAppLog(@"Audio frame streaming succeeded.");
-        }
-        else
-        {
-            QTFFAppLog(@"Audio frame streaming failed with error: %@", [error localizedDescription]);
-        }
-    }
-}
-
-- (BOOL)stopAudioStreaming;
-{
-    if (_isStreamingAudio)
-    {
-        NSError *error = nil;
-        //BOOL success = [_videoStreamer closeStream:&error];
-        BOOL success = YES;
-        
-        if (success)
-        {
-            QTFFAppLog(@"Audio streaming closed successfully.");
-            _isStreamingAudio = NO;
-            return YES;
-        }
-        else
-        {
-            QTFFAppLog(@"Audio streaming closing failed with error: %@", [error localizedDescription]);
-            _isStreamingAudio = YES;
-            return NO;
-        }
-    }
+    NSError *error = nil;
     
-    return YES;
+    BOOL success = [_avStreamer streamAudioFrame:sampleBuffer error:&error];
+    
+    if (success)
+    {
+        //QTFFAppLog(@"Audio frame streaming succeeded.");
+    }
+    else
+    {
+        QTFFAppLog(@"Audio frame streaming failed with error: %@", [error localizedDescription]);
+    }
 }
 
 #pragma mark - Streaming
@@ -625,18 +517,28 @@
 {
     if (! _isStreaming)
     {
-        if ([self startVideoStreaming])
+        // start the stream
+        QTFFAppLog(@"Starting streaming...");
+        
+        NSError *error = nil;
+        BOOL success = [_avStreamer openStream:&error];
+        
+        if (success)
         {
-            if ([self startAudioStreaming])
-            {
-                // set UI state
-                [_availableVideoCaptureDevicesPopUpButton setEnabled:NO];
-                [_availableAudioCaptureDevicesPopUpButton setEnabled:NO];
-                _streamingButton.title = @"Stop Streaming";
-                
-                // set streaming state
-                _isStreaming = YES;
-            }
+            QTFFAppLog(@"Streaming started successfully.");
+            
+            // set UI state
+            [_availableVideoCaptureDevicesPopUpButton setEnabled:NO];
+            [_availableAudioCaptureDevicesPopUpButton setEnabled:NO];
+            _streamingButton.title = @"Stop Streaming";
+            
+            // set streaming state
+            _isStreaming = YES;
+        }
+        else
+        {
+            QTFFAppLog(@"Stream starting failed with error: %@", [error localizedDescription]);
+            _isStreaming = NO;
         }
     }
 }
@@ -645,8 +547,17 @@
 {
     if (_isStreaming)
     {
-        [self stopVideoStreaming];
-        [self stopAudioStreaming];
+        NSError *error = nil;
+        BOOL success = [_avStreamer closeStream:&error];
+        
+        if (success)
+        {
+            QTFFAppLog(@"Streaming closed successfully.");
+        }
+        else
+        {
+            QTFFAppLog(@"Stream closing failed with error: %@", [error localizedDescription]);
+        }
         
         // set UI state
         [_availableVideoCaptureDevicesPopUpButton setEnabled:YES];
@@ -662,11 +573,8 @@
 
 - (void)captureOutput:(QTCaptureOutput *)captureOutput didOutputAudioSampleBuffer:(QTSampleBuffer *)sampleBuffer fromConnection:(QTCaptureConnection *)connection;
 {
-    if (_isStreamingAudio)
-    {
-        _capturedAudioFormatTextField.stringValue = [NSString stringWithFormat:@"∙ %@", [sampleBuffer.formatDescription localizedFormatSummary]];
-        [self streamAudioFrame:sampleBuffer];
-    }
+    _capturedAudioFormatTextField.stringValue = [NSString stringWithFormat:@"∙ %@", [sampleBuffer.formatDescription localizedFormatSummary]];
+    [self streamAudioFrame:sampleBuffer];
     
     [self performSelectorOnMainThread:@selector(updateAudioLevels) withObject:nil waitUntilDone:NO];
 }
@@ -683,11 +591,8 @@
      withSampleBuffer:(QTSampleBuffer *)sampleBuffer
        fromConnection:(QTCaptureConnection *)connection;
 {
-    if (_isStreamingVideo)
-    {
-        _capturedVideoFormatTextField.stringValue = [NSString stringWithFormat:@"∙ %@", [sampleBuffer.formatDescription localizedFormatSummary]];
-        [self streamVideoFrame:videoFrame sampleBuffer:sampleBuffer];
-    }
+    _capturedVideoFormatTextField.stringValue = [NSString stringWithFormat:@"∙ %@", [sampleBuffer.formatDescription localizedFormatSummary]];
+    [self streamVideoFrame:videoFrame sampleBuffer:sampleBuffer];
 }
 
 #pragma mark - NSAlert delegate methods
