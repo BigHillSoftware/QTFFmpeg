@@ -22,8 +22,32 @@
     AVFormatContext *_avOutputFormatContext;
     AVOutputFormat *_avOutputFormat;
     
+    // audio variables
     AVStream *_audioStream;
     AVFrame *_streamAudioFrame;
+    
+    // audio source data variables
+    int _sourceNumberOfChannels;
+    int64_t _sourceChannelLayout;
+    int _sourceSampleRate;
+    enum AVSampleFormat _sourceSampleFormat;
+    int _sourceNumberOfSamples;
+    int _sourceLineSize;
+    uint8_t **_sourceData;
+    
+    // audio destination data variables
+    int _destinationNumberOfChannels;
+    int64_t _destinationChannelLayout;
+    int _destinationSampleRate;
+    enum AVSampleFormat _destinationSampleFormat;
+    int _destinationNumberOfSamples;
+    int _destinationLineSize;
+    uint8_t **_destinationData;
+    
+    // audio resampler context
+    struct SwrContext *_resamplerCtx;
+    
+    
     
     AVStream *_videoStream;
     AVFrame *_inputVideoFrame;
@@ -530,120 +554,155 @@
                 //                QTFFAppLog(@"Is unsigned integer? %@", sampleBuffer.isUnsignedInteger ? @"YES" : @"NO");
                 
                 // source data variables
-                int sourceNumberOfChannels = sampleBuffer.channelsPerFrame;
-                int64_t sourceChannelLayout = av_get_default_channel_layout(sourceNumberOfChannels);
-                int sourceSampleRate = sampleBuffer.sampleRate;
-                enum AVSampleFormat sourceSampleFormat = config.audioInputSampleFormat;
-                int sourceNumberOfSamples = (int)(sampleBuffer.numberOfSamples);
-                int sourceLineSize = 0;
-                uint8_t **sourceData = NULL;
                 
-                // destination data variables
-                int destinationNumberOfChannels = codecCtx->channels;
-                int64_t destinationChannelLayout = codecCtx->channel_layout;
-                int destinationSampleRate = codecCtx->sample_rate;
-                enum AVSampleFormat destinationSampleFormat = codecCtx->sample_fmt;
-                int destinationLineSize = 0;
-                uint8_t **destinationData = NULL;
+                // determine sample format
+                enum AVSampleFormat sourceSampleFormat;
                 
-                // resample the audio to convert to a format that FFmpeg can use
-                
-                // allocate a resampler context
-                static struct SwrContext *resamplerCtx;
-                
-                resamplerCtx = swr_alloc_set_opts(NULL,
-                                                  destinationChannelLayout,
-                                                  destinationSampleFormat,
-                                                  destinationSampleRate,
-                                                  sourceChannelLayout,
-                                                  sourceSampleFormat,
-                                                  sourceSampleRate,
-                                                  0,
-                                                  NULL);
-                
-                if (resamplerCtx == NULL)
+                if (sampleBuffer.isFloat)
                 {
-                    if (error)
+                    sourceSampleFormat = AV_SAMPLE_FMT_FLTP;
+                }
+                else
+                {
+                    if (sampleBuffer.isSignedInteger)
                     {
-                        *error = [NSError errorWithDomain:QTFFVideoErrorDomain
-                                                     code:QTFFErrorCode_VideoStreamingError
-                                              description:@"Unable to create the resampler context for the audio frame."];
+                        sourceSampleFormat = AV_SAMPLE_FMT_S32P;
                     }
-                    
-                    // release resources
-                    [self releaseAudioMemorySourceData:sourceData destinationData:destinationData resamplerContext:resamplerCtx];
-                    
-                    return NO;
+                    else
+                    {
+                        if (error)
+                        {
+                            NSString *description = @"Incompatible input sample format.";
+                            *error = [NSError errorWithDomain:QTFFVideoErrorDomain
+                                                         code:QTFFErrorCode_VideoStreamingError
+                                                  description:description];
+                        }
+                        
+                        return NO;
+                    }
                 }
                 
-                // initialize the resampling context
-                int returnVal = swr_init(resamplerCtx);
+                int returnVal;
                 
-                if (returnVal < 0)
+                if (_sourceNumberOfChannels != sampleBuffer.channelsPerFrame ||
+                    _sourceSampleRate != sampleBuffer.sampleRate ||
+                    _sourceSampleFormat != sourceSampleFormat ||
+                    _sourceNumberOfSamples != (int)(sampleBuffer.numberOfSamples))
                 {
-                    if (error)
+                    // release existing resources
+                    [self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
+                    
+                    // set source data variables
+                    _sourceNumberOfChannels = sampleBuffer.channelsPerFrame;
+                    _sourceChannelLayout = av_get_default_channel_layout(_sourceNumberOfChannels);
+                    _sourceSampleRate = sampleBuffer.sampleRate;
+                    _sourceSampleFormat = sourceSampleFormat;
+                    _sourceNumberOfSamples = (int)(sampleBuffer.numberOfSamples);
+                    _sourceLineSize = 0;
+                    _sourceData = NULL;
+                    
+                    // allocate the source samples buffer
+                    returnVal = av_samples_alloc_array_and_samples(&_sourceData,
+                                                                   &_sourceLineSize,
+                                                                   _sourceNumberOfChannels,
+                                                                   _sourceNumberOfSamples,
+                                                                   _sourceSampleFormat,
+                                                                   0);
+                    
+                    if (returnVal < 0)
                     {
-                        NSString *description = [NSString stringWithFormat:@"Unable to init the resampler context, error: %d", returnVal];
-                        *error = [NSError errorWithDomain:QTFFVideoErrorDomain
-                                                     code:QTFFErrorCode_VideoStreamingError
-                                              description:description];
+                        if (error)
+                        {
+                            NSString *description = [NSString stringWithFormat:@"Unable to allocate source samples, error: %d", returnVal];
+                            *error = [NSError errorWithDomain:QTFFVideoErrorDomain
+                                                         code:QTFFErrorCode_VideoStreamingError
+                                                  description:description];
+                        }
+                        
+                        // release resources
+                        [self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
+                        
+                        return NO;
                     }
                     
-                    // release resources
-                    [self releaseAudioMemorySourceData:sourceData destinationData:destinationData resamplerContext:resamplerCtx];
+                    // set destination data variables
+                    _destinationNumberOfChannels = codecCtx->channels;
+                    _destinationChannelLayout = codecCtx->channel_layout;
+                    _destinationSampleRate = codecCtx->sample_rate;
+                    _destinationSampleFormat = codecCtx->sample_fmt;
+                    _destinationLineSize = 0;
+                    _destinationData = NULL;
                     
-                    return NO;
-                }
-                
-                // allocate the source samples buffer
-                returnVal = av_samples_alloc_array_and_samples(&sourceData,
-                                                               &sourceLineSize,
-                                                               sourceNumberOfChannels,
-                                                               sourceNumberOfSamples,
-                                                               sourceSampleFormat,
-                                                               0);
-                
-                if (returnVal < 0)
-                {
-                    if (error)
+                    _resamplerCtx = swr_alloc_set_opts(NULL,
+                                                       _destinationChannelLayout,
+                                                       _destinationSampleFormat,
+                                                       _destinationSampleRate,
+                                                       _sourceChannelLayout,
+                                                       _sourceSampleFormat,
+                                                       _sourceSampleRate,
+                                                       0,
+                                                       NULL);
+                    
+                    if (_resamplerCtx == NULL)
                     {
-                        NSString *description = [NSString stringWithFormat:@"Unable to allocate source samples, error: %d", returnVal];
-                        *error = [NSError errorWithDomain:QTFFVideoErrorDomain
-                                                     code:QTFFErrorCode_VideoStreamingError
-                                              description:description];
+                        if (error)
+                        {
+                            *error = [NSError errorWithDomain:QTFFVideoErrorDomain
+                                                         code:QTFFErrorCode_VideoStreamingError
+                                                  description:@"Unable to create the resampler context for the audio frame."];
+                        }
+                        
+                        // release resources
+                        [self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
+                        
+                        return NO;
                     }
                     
-                    // release resources
-                    [self releaseAudioMemorySourceData:sourceData destinationData:destinationData resamplerContext:resamplerCtx];
+                    // initialize the resampling context
+                    returnVal = swr_init(_resamplerCtx);
                     
-                    return NO;
-                }
-                
-                // compute destination number of samples
-                int destinationNumberOfSamples = (int)av_rescale_rnd(swr_get_delay(resamplerCtx, sourceSampleRate) + sourceNumberOfSamples, destinationSampleRate, sourceSampleRate, AV_ROUND_UP);
-                
-                // allocate the destination samples buffer
-                returnVal = av_samples_alloc_array_and_samples(&destinationData,
-                                                               &destinationLineSize,
-                                                               destinationNumberOfChannels,
-                                                               destinationNumberOfSamples,
-                                                               destinationSampleFormat,
-                                                               0);
-                
-                if (returnVal < 0)
-                {
-                    if (error)
+                    if (returnVal < 0)
                     {
-                        NSString *description = [NSString stringWithFormat:@"Unable to allocate destination samples, error: %d", returnVal];
-                        *error = [NSError errorWithDomain:QTFFVideoErrorDomain
-                                                     code:QTFFErrorCode_VideoStreamingError
-                                              description:description];
+                        if (error)
+                        {
+                            NSString *description = [NSString stringWithFormat:@"Unable to init the resampler context, error: %d", returnVal];
+                            *error = [NSError errorWithDomain:QTFFVideoErrorDomain
+                                                         code:QTFFErrorCode_VideoStreamingError
+                                                  description:description];
+                        }
+                        
+                        // release resources
+                        [self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
+                        
+                        return NO;
                     }
                     
-                    // release resources
-                    [self releaseAudioMemorySourceData:sourceData destinationData:destinationData resamplerContext:resamplerCtx];
+                    // compute destination number of samples
+                    _destinationNumberOfSamples = (int)av_rescale_rnd(swr_get_delay(_resamplerCtx, _sourceSampleRate) + _sourceNumberOfSamples, _destinationSampleRate, _sourceSampleRate, AV_ROUND_UP);
                     
-                    return NO;
+                    // allocate the destination samples buffer
+                    returnVal = av_samples_alloc_array_and_samples(&_destinationData,
+                                                                   &_destinationLineSize,
+                                                                   _destinationNumberOfChannels,
+                                                                   _destinationNumberOfSamples,
+                                                                   _destinationSampleFormat,
+                                                                   0);
+                    
+                    if (returnVal < 0)
+                    {
+                        if (error)
+                        {
+                            NSString *description = [NSString stringWithFormat:@"Unable to allocate destination samples, error: %d", returnVal];
+                            *error = [NSError errorWithDomain:QTFFVideoErrorDomain
+                                                         code:QTFFErrorCode_VideoStreamingError
+                                                  description:description];
+                        }
+                        
+                        // release resources
+                        [self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
+                        
+                        return NO;
+                    }
                 }
                 
                 // assign source data
@@ -659,8 +718,8 @@
                 //                 QTFFAppLog(@"QTKit total data size: %d", totalDataSize);
                 //                 QTFFAppLog(@"FFmpeg line size: %d", sourceLineSize);
                 
-                float *ch1Data = (float *)sourceData[0];
-                float *ch2Data = (float *)sourceData[1];
+                float *ch1Data = (float *)_sourceData[0];
+                float *ch2Data = (float *)_sourceData[1];
                 float *buffer1 = tempAudioBufferList->mBuffers[0].mData;
                 float *buffer2 = tempAudioBufferList->mBuffers[1].mData;
                 
@@ -676,18 +735,18 @@
                 //                 QTFFAppLog(@"Is ending address ch1Data[%d]: %p aligned? %@", i, &ch1Data[i], (int)&ch1Data[i] % 32 == 0 ? @"YES" : @"NO");
                 //                 QTFFAppLog(@"Is ending address ch12ata[%d]: %p aligned? %@", i, &ch2Data[i], (int)&ch2Data[i] % 32 == 0 ? @"YES" : @"NO");
                 
-                for (uint i = 0; i < sourceNumberOfSamples; i++)
+                for (uint i = 0; i < _sourceNumberOfSamples; i++)
                 {
                     ch1Data[i] = buffer1[i];
                     ch2Data[i] = buffer2[i];
                 }
                 
                 // convert to destination format
-                returnVal = swr_convert(resamplerCtx,
-                                        destinationData,
-                                        destinationNumberOfSamples,
-                                        (const uint8_t **)sourceData,
-                                        sourceNumberOfSamples);
+                returnVal = swr_convert(_resamplerCtx,
+                                        _destinationData,
+                                        _destinationNumberOfSamples,
+                                        (const uint8_t **)_sourceData,
+                                        _sourceNumberOfSamples);
                 
                 if (returnVal < 0)
                 {
@@ -698,19 +757,19 @@
                     }
                     
                     // release resources
-                    [self releaseAudioMemorySourceData:sourceData destinationData:destinationData resamplerContext:resamplerCtx];
+                    [self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
                     
                     return NO;
                 }
                 
-                int bufferSize = av_samples_get_buffer_size(&destinationLineSize,
-                                                            destinationNumberOfChannels,
-                                                            destinationNumberOfSamples,
-                                                            destinationSampleFormat,
+                int bufferSize = av_samples_get_buffer_size(&_destinationLineSize,
+                                                            _destinationNumberOfChannels,
+                                                            _destinationNumberOfSamples,
+                                                            _destinationSampleFormat,
                                                             0);
                 
                 //_streamAudioFrame->nb_samples = codecCtx->frame_size;
-                _streamAudioFrame->nb_samples = destinationNumberOfSamples;
+                _streamAudioFrame->nb_samples = _destinationNumberOfSamples;
                 _streamAudioFrame->format = codecCtx->sample_fmt;
                 _streamAudioFrame->channel_layout = codecCtx->channel_layout;
                 _streamAudioFrame->channels = codecCtx->channels;
@@ -737,7 +796,7 @@
                 returnVal = avcodec_fill_audio_frame(_streamAudioFrame,
                                                      _streamAudioFrame->channels,
                                                      _streamAudioFrame->format,
-                                                     (const uint8_t *)destinationData[0],
+                                                     (const uint8_t *)_destinationData[0],
                                                      bufferSize,
                                                      0);
                 
@@ -751,7 +810,7 @@
                     }
                     
                     // release resources
-                    [self releaseAudioMemorySourceData:sourceData destinationData:destinationData resamplerContext:resamplerCtx];
+                    [self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
                     
                     return NO;
                 }
@@ -809,7 +868,7 @@
                     }
                     
                     // release resources
-                    [self releaseAudioMemorySourceData:sourceData destinationData:destinationData resamplerContext:resamplerCtx];
+                    [self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
                     
                     return NO;
                 }
@@ -840,14 +899,14 @@
                         }
                         
                         // release resources
-                        [self releaseAudioMemorySourceData:sourceData destinationData:destinationData resamplerContext:resamplerCtx];
+                        [self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
                         
                         return NO;
                     }
                 }
                 
                 // release resources
-                [self releaseAudioMemorySourceData:sourceData destinationData:destinationData resamplerContext:resamplerCtx];
+                //[self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
                 
                 return YES;
             }
