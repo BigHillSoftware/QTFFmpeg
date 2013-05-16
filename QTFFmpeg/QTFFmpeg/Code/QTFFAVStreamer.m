@@ -1169,7 +1169,7 @@
 }
 
 - (void)releaseAudioMemorySourceData:(uint8_t **)sourceData destinationData:(uint8_t **)destinationData resamplerContext:(SwrContext *)resamplerCtx;
-{
+{    
     // release the source data
     if (sourceData)
     {
@@ -1177,16 +1177,29 @@
     }
     av_freep(&sourceData);
     
+    // audio source data variables
+    _sourceNumberOfChannels = -1;
+    _sourceChannelLayout = -1;
+    _sourceSampleRate = -1;
+    _sourceSampleFormat = -1;
+    _sourceNumberOfSamples = -1;
+    _sourceLineSize = -1;
+    
     // release the destination data
     if (destinationData)
     {
-        //for (uint i = 0; i < _audioStream->codec->channels; i++)
-        //{
         av_freep(&destinationData[0]);
-        //}
     }
     av_freep(&destinationData);
-    
+
+    // audio destination data variables
+    _destinationNumberOfChannels = -1;
+    _destinationChannelLayout = -1;
+    _destinationSampleRate = -1;
+    _destinationSampleFormat = -1;
+    _destinationNumberOfSamples = -1;
+    _destinationLineSize = -1;
+
     // release the resampler context
     swr_free(&resamplerCtx);
 }
