@@ -535,23 +535,24 @@
                 // get the codec context
                 AVCodecContext *codecCtx = _audioStream->codec;
                 
-                //                QTFFAppLog(@"%@", sampleBuffer.formatDescription.localizedFormatSummary);
-                //                QTFFAppLog(@"Sample rate:  %f", sampleBuffer.sampleRate);
-                //                QTFFAppLog(@"Bytes per packet:  %d", sampleBuffer.bytesPerPacket);
-                //                QTFFAppLog(@"Frames per packet:  %d", sampleBuffer.framesPerPacket);
-                //                QTFFAppLog(@"Bytes per frame:  %d", sampleBuffer.bytesPerFrame);
-                //                QTFFAppLog(@"Channels per frame: %d", sampleBuffer.channelsPerFrame);
-                //                QTFFAppLog(@"Bits per channel: %d", sampleBuffer.bitsPerChannel);
-                //                QTFFAppLog(@"Is float? %@", sampleBuffer.isFloat ? @"YES" : @"NO");
-                //                QTFFAppLog(@"Is big endian? %@", sampleBuffer.isBigEndian ? @"YES" : @"NO");
-                //                QTFFAppLog(@"Is little endian? %@", sampleBuffer.isLittleEndian ? @"YES" : @"NO");
-                //                QTFFAppLog(@"Is non-mixable? %@", sampleBuffer.isNonMixable ? @"YES" : @"NO");
-                //                QTFFAppLog(@"Is aligned high? %@", sampleBuffer.isAlignedHigh ? @"YES" : @"NO");
-                //                QTFFAppLog(@"Is packed? %@", sampleBuffer.isPacked ? @"YES" : @"NO");
-                //                QTFFAppLog(@"Is non-interleaved? %@", sampleBuffer.isNonInterleaved ? @"YES" : @"NO");
-                //                QTFFAppLog(@"Is interleaved? %@", sampleBuffer.isInterleaved ? @"YES" : @"NO");
-                //                QTFFAppLog(@"Is signed integer? %@", sampleBuffer.isSignedInteger ? @"YES" : @"NO");
-                //                QTFFAppLog(@"Is unsigned integer? %@", sampleBuffer.isUnsignedInteger ? @"YES" : @"NO");
+                QTFFAppLog(@"%@", sampleBuffer.formatDescription.localizedFormatSummary);
+                QTFFAppLog(@"Sample rate:  %f", sampleBuffer.sampleRate);
+                QTFFAppLog(@"Bytes per packet:  %d", sampleBuffer.bytesPerPacket);
+                QTFFAppLog(@"Frames per packet:  %d", sampleBuffer.framesPerPacket);
+                QTFFAppLog(@"Bytes per frame:  %d", sampleBuffer.bytesPerFrame);
+                QTFFAppLog(@"Channels per frame: %d", sampleBuffer.channelsPerFrame);
+                QTFFAppLog(@"Bits per channel: %d", sampleBuffer.bitsPerChannel);
+                QTFFAppLog(@"Number of samples: %ld", (unsigned long)sampleBuffer.numberOfSamples);
+                QTFFAppLog(@"Is float? %@", sampleBuffer.isFloat ? @"YES" : @"NO");
+                QTFFAppLog(@"Is big endian? %@", sampleBuffer.isBigEndian ? @"YES" : @"NO");
+                QTFFAppLog(@"Is little endian? %@", sampleBuffer.isLittleEndian ? @"YES" : @"NO");
+                QTFFAppLog(@"Is non-mixable? %@", sampleBuffer.isNonMixable ? @"YES" : @"NO");
+                QTFFAppLog(@"Is aligned high? %@", sampleBuffer.isAlignedHigh ? @"YES" : @"NO");
+                QTFFAppLog(@"Is packed? %@", sampleBuffer.isPacked ? @"YES" : @"NO");
+                QTFFAppLog(@"Is non-interleaved? %@", sampleBuffer.isNonInterleaved ? @"YES" : @"NO");
+                QTFFAppLog(@"Is interleaved? %@", sampleBuffer.isInterleaved ? @"YES" : @"NO");
+                QTFFAppLog(@"Is signed integer? %@", sampleBuffer.isSignedInteger ? @"YES" : @"NO");
+                QTFFAppLog(@"Is unsigned integer? %@", sampleBuffer.isUnsignedInteger ? @"YES" : @"NO");
                 
                 // source data variables
                 
@@ -708,15 +709,15 @@
                 // assign source data
                 AudioBufferList *tempAudioBufferList = [sampleBuffer audioBufferListWithOptions:0];
                 
-                //                 int totalDataSize = 0;
-                //
-                //                 for (int count = 0; count < tempAudioBufferList->mNumberBuffers; count++)
-                //                 {
-                //                 totalDataSize += tempAudioBufferList->mBuffers[count].mDataByteSize;
-                //                 }
-                //
-                //                 QTFFAppLog(@"QTKit total data size: %d", totalDataSize);
-                //                 QTFFAppLog(@"FFmpeg line size: %d", sourceLineSize);
+                int totalDataSize = 0;
+                
+                for (int count = 0; count < tempAudioBufferList->mNumberBuffers; count++)
+                {
+                    totalDataSize += tempAudioBufferList->mBuffers[count].mDataByteSize;
+                }
+                
+                QTFFAppLog(@"QTKit total data size: %d", totalDataSize);
+                QTFFAppLog(@"FFmpeg line size: %d", _sourceLineSize);
                 
                 float *ch1Data = (float *)_sourceData[0];
                 float *ch2Data = (float *)_sourceData[1];
