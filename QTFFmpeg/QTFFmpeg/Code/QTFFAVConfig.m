@@ -53,7 +53,8 @@
 #define AUDIO_CODEC_SAMPLE_RATE                                 44100
 //#define AUDIO_CODEC_SAMPLE_RATE                                 96000
 //#define AUDIO_CODEC_CHANNEL_LAYOUT                              AV_CH_LAYOUT_STEREO
-#define AUDIO_CODEC_NUMBER_OF_CHANNELS                          2
+//#define AUDIO_CODEC_NUMBER_OF_CHANNELS                          2
+#define AUDIO_CODEC_NUMBER_OF_CHANNELS                          1
 
 //#define AUDIO_CODEC_SAMPLE_FORMAT                               AV_SAMPLE_FMT_FLT
 #define AUDIO_CODEC_SAMPLE_FORMAT                               AV_SAMPLE_FMT_FLTP

@@ -591,7 +591,7 @@
                     _sourceNumberOfSamples != (int)(sampleBuffer.numberOfSamples))
                 {
                     // release existing resources
-                    [self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
+                    [self releaseAudioMemory];
                     
                     // set source data variables
                     _sourceNumberOfChannels = sampleBuffer.channelsPerFrame;
@@ -621,7 +621,7 @@
                         }
                         
                         // release resources
-                        [self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
+                        [self releaseAudioMemory];
                         
                         return NO;
                     }
@@ -654,7 +654,7 @@
                         }
                         
                         // release resources
-                        [self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
+                        [self releaseAudioMemory];
                         
                         return NO;
                     }
@@ -673,13 +673,14 @@
                         }
                         
                         // release resources
-                        [self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
+                        [self releaseAudioMemory];
                         
                         return NO;
                     }
                     
                     // compute destination number of samples
-                    _destinationNumberOfSamples = (int)av_rescale_rnd(swr_get_delay(_resamplerCtx, _sourceSampleRate) + _sourceNumberOfSamples, _destinationSampleRate, _sourceSampleRate, AV_ROUND_UP);
+                    //_destinationNumberOfSamples = (int)av_rescale_rnd(swr_get_delay(_resamplerCtx, _sourceSampleRate) + _sourceNumberOfSamples, _destinationSampleRate, _sourceSampleRate, AV_ROUND_UP);
+                    _destinationNumberOfSamples = codecCtx->frame_size;
                     
                     // allocate the destination samples buffer
                     returnVal = av_samples_alloc_array_and_samples(&_destinationData,
@@ -700,7 +701,7 @@
                         }
                         
                         // release resources
-                        [self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
+                        [self releaseAudioMemory];
                         
                         return NO;
                     }
@@ -709,20 +710,35 @@
                 // assign source data
                 AudioBufferList *tempAudioBufferList = [sampleBuffer audioBufferListWithOptions:0];
                 
-                int totalDataSize = 0;
+                /*
+                 int totalDataSize = 0;
+                 
+                 for (int count = 0; count < tempAudioBufferList->mNumberBuffers; count++)
+                 {
+                 totalDataSize += tempAudioBufferList->mBuffers[count].mDataByteSize;
+                 }
+                 
+                 QTFFAppLog(@"QTKit total data size: %d", totalDataSize);
+                 QTFFAppLog(@"FFmpeg line size: %d", _sourceLineSize);
+                 */
                 
-                for (int count = 0; count < tempAudioBufferList->mNumberBuffers; count++)
+                for (uint j = 0; j < _sourceNumberOfChannels; j++)
                 {
-                    totalDataSize += tempAudioBufferList->mBuffers[count].mDataByteSize;
+                    float *channelData = (float *)_sourceData[j];
+                    float *captureBuffer = tempAudioBufferList->mBuffers[j].mData;
+                    
+                    for (uint i = 0; i < _sourceNumberOfSamples; i++)
+                    {
+                        channelData[i] = captureBuffer[i];
+                    }
                 }
                 
-                QTFFAppLog(@"QTKit total data size: %d", totalDataSize);
-                QTFFAppLog(@"FFmpeg line size: %d", _sourceLineSize);
-                
-                float *ch1Data = (float *)_sourceData[0];
-                float *ch2Data = (float *)_sourceData[1];
-                float *buffer1 = tempAudioBufferList->mBuffers[0].mData;
-                float *buffer2 = tempAudioBufferList->mBuffers[1].mData;
+                /*
+                 float *ch1Data = (float *)_sourceData[0];
+                 float *ch2Data = (float *)_sourceData[1];
+                 float *buffer1 = tempAudioBufferList->mBuffers[0].mData;
+                 float *buffer2 = tempAudioBufferList->mBuffers[1].mData;
+                 */
                 
                 //                 uint i = 0;
                 //                 QTFFAppLog(@"Is starting address channel 1 capture buffer: %p aligned? %@", &tempAudioBufferList->mBuffers[0].mData[i], (int)&tempAudioBufferList->mBuffers[0].mData[i] % 32 == 0 ? @"YES" : @"NO");
@@ -736,11 +752,13 @@
                 //                 QTFFAppLog(@"Is ending address ch1Data[%d]: %p aligned? %@", i, &ch1Data[i], (int)&ch1Data[i] % 32 == 0 ? @"YES" : @"NO");
                 //                 QTFFAppLog(@"Is ending address ch12ata[%d]: %p aligned? %@", i, &ch2Data[i], (int)&ch2Data[i] % 32 == 0 ? @"YES" : @"NO");
                 
-                for (uint i = 0; i < _sourceNumberOfSamples; i++)
-                {
-                    ch1Data[i] = buffer1[i];
-                    ch2Data[i] = buffer2[i];
-                }
+                /*
+                 for (uint i = 0; i < _sourceNumberOfSamples; i++)
+                 {
+                 ch1Data[i] = buffer1[i];
+                 ch2Data[i] = buffer2[i];
+                 }
+                 */
                 
                 // convert to destination format
                 returnVal = swr_convert(_resamplerCtx,
@@ -758,7 +776,7 @@
                     }
                     
                     // release resources
-                    [self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
+                    [self releaseAudioMemory];
                     
                     return NO;
                 }
@@ -811,7 +829,7 @@
                     }
                     
                     // release resources
-                    [self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
+                    [self releaseAudioMemory];
                     
                     return NO;
                 }
@@ -859,6 +877,9 @@
                 // encode the audio
                 returnVal = avcodec_encode_audio2(codecCtx, &_avPacket, _streamAudioFrame, &gotPacket);
                 
+                QTFFAppLog(@"Codec context frame size: %d", codecCtx->frame_size);
+                QTFFAppLog(@"Frame number of samples: %d", _streamAudioFrame->nb_samples);
+                
                 if (returnVal != 0)
                 {
                     if (error)
@@ -869,7 +890,7 @@
                     }
                     
                     // release resources
-                    [self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
+                    [self releaseAudioMemory];
                     
                     return NO;
                 }
@@ -900,14 +921,14 @@
                         }
                         
                         // release resources
-                        [self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
+                        [self releaseAudioMemory];
                         
                         return NO;
                     }
                 }
                 
                 // release resources
-                //[self releaseAudioMemorySourceData:_sourceData destinationData:_destinationData resamplerContext:_resamplerCtx];
+                //[self releaseAudioMemory];
                 
                 return YES;
             }
@@ -1168,14 +1189,14 @@
     return frame;
 }
 
-- (void)releaseAudioMemorySourceData:(uint8_t **)sourceData destinationData:(uint8_t **)destinationData resamplerContext:(SwrContext *)resamplerCtx;
-{    
+- (void)releaseAudioMemory;
+{
     // release the source data
-    if (sourceData)
+    if (_sourceData)
     {
-        av_freep(&sourceData[0]);
+        av_freep(&_sourceData[0]);
     }
-    av_freep(&sourceData);
+    av_freep(&_sourceData);
     
     // audio source data variables
     _sourceNumberOfChannels = -1;
@@ -1186,12 +1207,12 @@
     _sourceLineSize = -1;
     
     // release the destination data
-    if (destinationData)
+    if (_destinationData)
     {
-        av_freep(&destinationData[0]);
+        av_freep(&_destinationData[0]);
     }
-    av_freep(&destinationData);
-
+    av_freep(&_destinationData);
+    
     // audio destination data variables
     _destinationNumberOfChannels = -1;
     _destinationChannelLayout = -1;
@@ -1199,9 +1220,9 @@
     _destinationSampleFormat = -1;
     _destinationNumberOfSamples = -1;
     _destinationLineSize = -1;
-
+    
     // release the resampler context
-    swr_free(&resamplerCtx);
+    swr_free(&_resamplerCtx);
 }
 
 @end

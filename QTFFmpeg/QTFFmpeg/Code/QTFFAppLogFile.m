@@ -115,8 +115,8 @@ static QTFFAppLogFile *_sharedAppLogFile;
         }
         else
         {
-            static NSString * const newline = @"\n";
-            NSString *fullMessage = [message stringByAppendingString:newline];
+            NSString *dateString = [[NSDate date] stringWithFormat:LOG_FILENAME_DATE_FORMAT];
+            NSString *fullMessage = [NSString stringWithFormat:@"[%@] %@\n", dateString, message];
             NSData *fullMessageData = [fullMessage dataUsingEncoding:NSUTF8StringEncoding];
             [_fileHandle writeData:fullMessageData];
             [_fileHandle synchronizeFile];
