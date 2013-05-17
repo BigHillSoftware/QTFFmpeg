@@ -21,7 +21,7 @@
 #define VIDEO_CAPTURE_PIXEL_BUFFER_FORMAT_TYPE                  kCVPixelFormatType_422YpCbCr8
 
 #define SHOULD_STREAM_AUDIO                                     YES
-#define SHOULD_STREAM_VIDEO                                     NO
+#define SHOULD_STREAM_VIDEO                                     YES
 
 #define STREAM_OUTPUT_STREAM_TYPE                               QTFFStreamTypeFile
 #define STREAM_OUTPUT_STREAM_NAME                               @"Output.flv"

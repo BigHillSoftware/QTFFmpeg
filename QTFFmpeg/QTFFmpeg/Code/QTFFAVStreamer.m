@@ -25,7 +25,7 @@
     // audio variables
     AVStream *_audioStream;
     AVFrame *_streamAudioFrame;
-    BOOL _hasCodecCapDelay;
+    BOOL _hasAudioCodecCapDelay;
     
     // audio source data variables
     int _sourceNumberOfChannels;
@@ -60,6 +60,9 @@
     AVFrame *_inputVideoFrame;
     AVFrame *_lastStreamVideoFrame;
     AVFrame *_currentStreamVideoFrame;
+    
+    // image convert context
+    struct SwsContext *_imgConvertCtx;
     
     // video encoding
     double _videoTimeBaseUnit;
@@ -362,7 +365,7 @@
     
     //QTFFAppLog(@"Audio codec frame size: %d", audioCodecCtx->frame_size);
     
-    _hasCodecCapDelay = audioCodecCtx->codec->capabilities & CODEC_CAP_DELAY;
+    _hasAudioCodecCapDelay = audioCodecCtx->codec->capabilities & CODEC_CAP_DELAY;
     _audioTimeBaseUnit = ((double)audioCodecCtx->time_base.num / (double)audioCodecCtx->time_base.den);
     
     // initialize the output audio frame
@@ -375,7 +378,7 @@
 {
     if (_audioStream)
     {
-        if (_hasCodecCapDelay)
+        if (_hasAudioCodecCapDelay)
         {
             // flush the audio codec
             
@@ -520,6 +523,31 @@
     return YES;
 }
 
+- (void)closeVideoStream;
+{
+    sws_freeContext(_imgConvertCtx);
+    
+    if (_videoStream)
+    {
+        avcodec_close(_videoStream->codec);
+    }
+    
+    if (_inputVideoFrame)
+    {
+        av_frame_free(&_inputVideoFrame);
+    }
+    
+    if (_lastStreamVideoFrame)
+    {
+        av_frame_free(&_lastStreamVideoFrame);
+    }
+    
+    if (_currentStreamVideoFrame)
+    {
+        av_frame_free(&_currentStreamVideoFrame);
+    }
+}
+
 - (BOOL)closeStream:(NSError **)error;
 {
     @synchronized(self)
@@ -551,7 +579,7 @@
             // cleanup the video stream
             if (config.shouldStreamVideo)
             {
-                
+                [self closeVideoStream];
             }
             
             // write the trailer
@@ -795,7 +823,7 @@
                 {
                     float *channelData = (float *)_sourceData[j];
                     float *captureBuffer = tempAudioBufferList->mBuffers[j].mData;
-
+                    
                     for (uint i = 0; i < _sourceNumberOfSamples; i++)
                     {
                         channelData[i] = captureBuffer[i];
@@ -956,8 +984,8 @@
                 {
                     //if (! _hasCodecCapDelay)
                     //{
-                        _avPacket.pts = av_rescale_q(_capturedAudioFramePts, codecCtx->time_base, _audioStream->time_base);
-                        _avPacket.dts = _avPacket.pts;
+                    _avPacket.pts = av_rescale_q(_capturedAudioFramePts, codecCtx->time_base, _audioStream->time_base);
+                    _avPacket.dts = _avPacket.pts;
                     //}
                     
                     //QTFFAppLog(@"Pre-writing audio pts: %lld", _avPacket.pts);
@@ -1043,34 +1071,31 @@
                 AVCodecContext *codecCtx = _videoStream->codec;
                 
                 // must stream a YUV420P picture, so convert the frame if needed
-                static struct SwsContext *imgConvertCtx;
                 static int sws_flags = SWS_BICUBIC;
                 
                 // create a convert context if necessary
-                if (imgConvertCtx == NULL)
+                _imgConvertCtx = sws_getCachedContext(_imgConvertCtx,
+                                                      width,
+                                                      height,
+                                                      config.videoInputPixelFormat,
+                                                      codecCtx->width,
+                                                      codecCtx->height,
+                                                      codecCtx->pix_fmt,
+                                                      sws_flags,
+                                                      NULL,
+                                                      NULL,
+                                                      NULL);
+                
+                if (_imgConvertCtx == NULL)
                 {
-                    imgConvertCtx = sws_getContext(width,
-                                                   height,
-                                                   config.videoInputPixelFormat,
-                                                   codecCtx->width,
-                                                   codecCtx->height,
-                                                   codecCtx->pix_fmt,
-                                                   sws_flags,
-                                                   NULL,
-                                                   NULL,
-                                                   NULL);
-                    
-                    if (imgConvertCtx == NULL)
+                    if (error)
                     {
-                        if (error)
-                        {
-                            *error = [NSError errorWithDomain:QTFFVideoErrorDomain
-                                                         code:QTFFErrorCode_VideoStreamingError
-                                                  description:@"Unable to create the image conversion context for the video frame."];
-                        }
-                        
-                        return NO;
+                        *error = [NSError errorWithDomain:QTFFVideoErrorDomain
+                                                     code:QTFFErrorCode_VideoStreamingError
+                                              description:@"Unable to create the image conversion context for the video frame."];
                     }
+                    
+                    return NO;
                 }
                 
                 // take the input buffer and fill the input frame
@@ -1087,7 +1112,7 @@
                 }
                 
                 // convert the input frame to an output frame for streaming
-                sws_scale(imgConvertCtx, (const u_int8_t* const*)_inputVideoFrame->data, _inputVideoFrame->linesize,
+                sws_scale(_imgConvertCtx, (const u_int8_t* const*)_inputVideoFrame->data, _inputVideoFrame->linesize,
                           0, codecCtx->height, _currentStreamVideoFrame->data, _currentStreamVideoFrame->linesize);
                 
                 //QTFFAppLog(@"Video frame decode time: %lld", sampleBuffer.decodeTime.timeValue);
@@ -1163,7 +1188,6 @@
                     // only when there is a full packet returned for streaming should writing be attempted.
                     if (gotPacket == 1)
                     {
-                        
                         if (codecCtx->coded_frame->pts != AV_NOPTS_VALUE)
                         {
                             _avPacket.pts = av_rescale_q(codecCtx->coded_frame->pts, codecCtx->time_base, _videoStream->time_base);
@@ -1193,8 +1217,14 @@
                                                       description:[NSString stringWithFormat:@"Unable to write the video frame to the stream, error: %d", returnVal]];
                             }
                             
+                            // release the packet
+                            av_free_packet(&_avPacket);
+                            
                             return NO;
                         }
+                        
+                        // release the packet
+                        av_free_packet(&_avPacket);
                     }
                 }
                 
