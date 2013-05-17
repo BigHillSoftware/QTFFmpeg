@@ -25,6 +25,7 @@
     // audio variables
     AVStream *_audioStream;
     AVFrame *_streamAudioFrame;
+    BOOL _hasCodecCapDelay;
     
     // audio source data variables
     int _sourceNumberOfChannels;
@@ -47,25 +48,27 @@
     // audio resampler context
     struct SwrContext *_resamplerCtx;
     
-    
-    
-    AVStream *_videoStream;
-    AVFrame *_inputVideoFrame;
-    AVFrame *_lastStreamVideoFrame;
-    AVFrame *_currentStreamVideoFrame;
-    
-    AVPacket _avPacket;
-    
+    // audio encoding
     double _audioTimeBaseUnit;
     BOOL _hasFirstSampleBufferAudioFrame;
     double _firstSampleBufferAudioFramePresentationTime;
     double _lastCapturedAudioFramePresentationTime;
     int64_t _capturedAudioFramePts;
     
+    // video variables
+    AVStream *_videoStream;
+    AVFrame *_inputVideoFrame;
+    AVFrame *_lastStreamVideoFrame;
+    AVFrame *_currentStreamVideoFrame;
+    
+    // video encoding
     double _videoTimeBaseUnit;
     BOOL _hasFirstSampleBufferVideoFrame;
     double _firstSampleBufferVideoFramePresentationTime;
     int64_t _capturedVideoFramePts;
+    
+    // output
+    AVPacket _avPacket;
 }
 
 @end
@@ -359,6 +362,7 @@
     
     //QTFFAppLog(@"Audio codec frame size: %d", audioCodecCtx->frame_size);
     
+    _hasCodecCapDelay = audioCodecCtx->codec->capabilities & CODEC_CAP_DELAY;
     _audioTimeBaseUnit = ((double)audioCodecCtx->time_base.num / (double)audioCodecCtx->time_base.den);
     
     // initialize the output audio frame
@@ -371,6 +375,65 @@
 {
     if (_audioStream)
     {
+        if (_hasCodecCapDelay)
+        {
+            // flush the audio codec
+            
+            // get the codec context
+            AVCodecContext *codecCtx = _audioStream->codec;
+            int gotPacket;
+            
+            do {
+                _avPacket.data = NULL;
+                _avPacket.size = 0;
+                gotPacket = 0;
+                
+                int returnVal = avcodec_encode_audio2(codecCtx, &_avPacket, NULL, &gotPacket);
+                
+                if (returnVal != 0)
+                {
+                    QTFFAppLog(@"Unable to flush the audio frame, error: %d", returnVal);
+                    break;
+                }
+                
+                // if a packet was returned, write it to the network stream. The codec may take several calls before returning a packet.
+                // only when there is a full packet returned for streaming should writing be attempted.
+                if (gotPacket == 1)
+                {
+                    //if (! _hasCodecCapDelay)
+                    //{
+                    _avPacket.pts = av_rescale_q(_capturedAudioFramePts, codecCtx->time_base, _audioStream->time_base);
+                    _avPacket.dts = _avPacket.pts;
+                    //}
+                    
+                    //QTFFAppLog(@"Pre-writing audio pts: %lld", _avPacket.pts);
+                    
+                    _avPacket.flags |= AV_PKT_FLAG_KEY;
+                    _avPacket.stream_index = _audioStream->index;
+                    
+                    // write the frame
+                    returnVal = av_interleaved_write_frame(_avOutputFormatContext, &_avPacket);
+                    //returnVal = av_write_frame(_avOutputFormatContext, &_avPacket);
+                    
+                    if (returnVal != 0)
+                    {
+                        QTFFAppLog(@"Unable to write the flushed audio frame to the stream, error: %d", returnVal);
+                        
+                        // release the packet
+                        av_free_packet(&_avPacket);
+                        
+                        break;
+                    }
+                    
+                    // release the packet
+                    av_free_packet(&_avPacket);
+                }
+            } while (gotPacket == 1);
+        }
+        
+        // release resources
+        [self releaseAudioMemory];
+        
         avcodec_close(_audioStream->codec);
     }
     
@@ -479,22 +542,27 @@
                 *error = nil;
             }
             
-            // write the trailer
-            QTFFAppLog(@"Writing the stream trailer.");
-            int returnVal = av_write_trailer(_avOutputFormatContext);
-            
-            // free the packet
-            av_free_packet(&_avPacket);
-            
+            // cleanup the audio stream
             if (config.shouldStreamAudio)
             {
                 [self closeAudioStream];
             }
             
+            // cleanup the video stream
             if (config.shouldStreamVideo)
             {
                 
             }
+            
+            // write the trailer
+            QTFFAppLog(@"Writing the stream trailer.");
+            int returnVal = av_write_trailer(_avOutputFormatContext);
+            
+            // close the io
+            avio_closep(&_avOutputFormatContext->pb);
+            
+            // free the packet
+            av_free_packet(&_avPacket);
             
             // free the context
             avformat_free_context(_avOutputFormatContext);
@@ -535,24 +603,26 @@
                 // get the codec context
                 AVCodecContext *codecCtx = _audioStream->codec;
                 
-                QTFFAppLog(@"%@", sampleBuffer.formatDescription.localizedFormatSummary);
-                QTFFAppLog(@"Sample rate:  %f", sampleBuffer.sampleRate);
-                QTFFAppLog(@"Bytes per packet:  %d", sampleBuffer.bytesPerPacket);
-                QTFFAppLog(@"Frames per packet:  %d", sampleBuffer.framesPerPacket);
-                QTFFAppLog(@"Bytes per frame:  %d", sampleBuffer.bytesPerFrame);
-                QTFFAppLog(@"Channels per frame: %d", sampleBuffer.channelsPerFrame);
-                QTFFAppLog(@"Bits per channel: %d", sampleBuffer.bitsPerChannel);
-                QTFFAppLog(@"Number of samples: %ld", (unsigned long)sampleBuffer.numberOfSamples);
-                QTFFAppLog(@"Is float? %@", sampleBuffer.isFloat ? @"YES" : @"NO");
-                QTFFAppLog(@"Is big endian? %@", sampleBuffer.isBigEndian ? @"YES" : @"NO");
-                QTFFAppLog(@"Is little endian? %@", sampleBuffer.isLittleEndian ? @"YES" : @"NO");
-                QTFFAppLog(@"Is non-mixable? %@", sampleBuffer.isNonMixable ? @"YES" : @"NO");
-                QTFFAppLog(@"Is aligned high? %@", sampleBuffer.isAlignedHigh ? @"YES" : @"NO");
-                QTFFAppLog(@"Is packed? %@", sampleBuffer.isPacked ? @"YES" : @"NO");
-                QTFFAppLog(@"Is non-interleaved? %@", sampleBuffer.isNonInterleaved ? @"YES" : @"NO");
-                QTFFAppLog(@"Is interleaved? %@", sampleBuffer.isInterleaved ? @"YES" : @"NO");
-                QTFFAppLog(@"Is signed integer? %@", sampleBuffer.isSignedInteger ? @"YES" : @"NO");
-                QTFFAppLog(@"Is unsigned integer? %@", sampleBuffer.isUnsignedInteger ? @"YES" : @"NO");
+                /*
+                 QTFFAppLog(@"%@", sampleBuffer.formatDescription.localizedFormatSummary);
+                 QTFFAppLog(@"Sample rate:  %f", sampleBuffer.sampleRate);
+                 QTFFAppLog(@"Bytes per packet:  %d", sampleBuffer.bytesPerPacket);
+                 QTFFAppLog(@"Frames per packet:  %d", sampleBuffer.framesPerPacket);
+                 QTFFAppLog(@"Bytes per frame:  %d", sampleBuffer.bytesPerFrame);
+                 QTFFAppLog(@"Channels per frame: %d", sampleBuffer.channelsPerFrame);
+                 QTFFAppLog(@"Bits per channel: %d", sampleBuffer.bitsPerChannel);
+                 QTFFAppLog(@"Number of samples: %ld", (unsigned long)sampleBuffer.numberOfSamples);
+                 QTFFAppLog(@"Is float? %@", sampleBuffer.isFloat ? @"YES" : @"NO");
+                 QTFFAppLog(@"Is big endian? %@", sampleBuffer.isBigEndian ? @"YES" : @"NO");
+                 QTFFAppLog(@"Is little endian? %@", sampleBuffer.isLittleEndian ? @"YES" : @"NO");
+                 QTFFAppLog(@"Is non-mixable? %@", sampleBuffer.isNonMixable ? @"YES" : @"NO");
+                 QTFFAppLog(@"Is aligned high? %@", sampleBuffer.isAlignedHigh ? @"YES" : @"NO");
+                 QTFFAppLog(@"Is packed? %@", sampleBuffer.isPacked ? @"YES" : @"NO");
+                 QTFFAppLog(@"Is non-interleaved? %@", sampleBuffer.isNonInterleaved ? @"YES" : @"NO");
+                 QTFFAppLog(@"Is interleaved? %@", sampleBuffer.isInterleaved ? @"YES" : @"NO");
+                 QTFFAppLog(@"Is signed integer? %@", sampleBuffer.isSignedInteger ? @"YES" : @"NO");
+                 QTFFAppLog(@"Is unsigned integer? %@", sampleBuffer.isUnsignedInteger ? @"YES" : @"NO");
+                 */
                 
                 // source data variables
                 
@@ -678,9 +748,8 @@
                         return NO;
                     }
                     
-                    // compute destination number of samples
-                    //_destinationNumberOfSamples = (int)av_rescale_rnd(swr_get_delay(_resamplerCtx, _sourceSampleRate) + _sourceNumberOfSamples, _destinationSampleRate, _sourceSampleRate, AV_ROUND_UP);
-                    _destinationNumberOfSamples = codecCtx->frame_size;
+                    _destinationNumberOfSamples = (int)av_rescale_rnd(swr_get_delay(_resamplerCtx, _sourceSampleRate) + _sourceNumberOfSamples, _destinationSampleRate, _sourceSampleRate, AV_ROUND_UP);
+                    //_destinationNumberOfSamples = codecCtx->frame_size;
                     
                     // allocate the destination samples buffer
                     returnVal = av_samples_alloc_array_and_samples(&_destinationData,
@@ -726,19 +795,12 @@
                 {
                     float *channelData = (float *)_sourceData[j];
                     float *captureBuffer = tempAudioBufferList->mBuffers[j].mData;
-                    
+
                     for (uint i = 0; i < _sourceNumberOfSamples; i++)
                     {
                         channelData[i] = captureBuffer[i];
                     }
                 }
-                
-                /*
-                 float *ch1Data = (float *)_sourceData[0];
-                 float *ch2Data = (float *)_sourceData[1];
-                 float *buffer1 = tempAudioBufferList->mBuffers[0].mData;
-                 float *buffer2 = tempAudioBufferList->mBuffers[1].mData;
-                 */
                 
                 //                 uint i = 0;
                 //                 QTFFAppLog(@"Is starting address channel 1 capture buffer: %p aligned? %@", &tempAudioBufferList->mBuffers[0].mData[i], (int)&tempAudioBufferList->mBuffers[0].mData[i] % 32 == 0 ? @"YES" : @"NO");
@@ -751,14 +813,6 @@
                 //                 QTFFAppLog(@"Is ending address channel 2 capture buffer: %p aligned? %@", &tempAudioBufferList->mBuffers[1].mData[i], (int)&tempAudioBufferList->mBuffers[1].mData[i] % 32 == 0 ? @"YES" : @"NO");
                 //                 QTFFAppLog(@"Is ending address ch1Data[%d]: %p aligned? %@", i, &ch1Data[i], (int)&ch1Data[i] % 32 == 0 ? @"YES" : @"NO");
                 //                 QTFFAppLog(@"Is ending address ch12ata[%d]: %p aligned? %@", i, &ch2Data[i], (int)&ch2Data[i] % 32 == 0 ? @"YES" : @"NO");
-                
-                /*
-                 for (uint i = 0; i < _sourceNumberOfSamples; i++)
-                 {
-                 ch1Data[i] = buffer1[i];
-                 ch2Data[i] = buffer2[i];
-                 }
-                 */
                 
                 // convert to destination format
                 returnVal = swr_convert(_resamplerCtx,
@@ -787,7 +841,6 @@
                                                             _destinationSampleFormat,
                                                             0);
                 
-                //_streamAudioFrame->nb_samples = codecCtx->frame_size;
                 _streamAudioFrame->nb_samples = _destinationNumberOfSamples;
                 _streamAudioFrame->format = codecCtx->sample_fmt;
                 _streamAudioFrame->channel_layout = codecCtx->channel_layout;
@@ -877,8 +930,10 @@
                 // encode the audio
                 returnVal = avcodec_encode_audio2(codecCtx, &_avPacket, _streamAudioFrame, &gotPacket);
                 
-                QTFFAppLog(@"Codec context frame size: %d", codecCtx->frame_size);
-                QTFFAppLog(@"Frame number of samples: %d", _streamAudioFrame->nb_samples);
+                /*
+                 QTFFAppLog(@"Codec context frame size: %d", codecCtx->frame_size);
+                 QTFFAppLog(@"Frame number of samples: %d", _streamAudioFrame->nb_samples);
+                 */
                 
                 if (returnVal != 0)
                 {
@@ -899,8 +954,11 @@
                 // only when there is a full packet returned for streaming should writing be attempted.
                 if (gotPacket == 1)
                 {
-                    _avPacket.pts = av_rescale_q(_capturedAudioFramePts, codecCtx->time_base, _audioStream->time_base);
-                    _avPacket.dts = _avPacket.pts;
+                    //if (! _hasCodecCapDelay)
+                    //{
+                        _avPacket.pts = av_rescale_q(_capturedAudioFramePts, codecCtx->time_base, _audioStream->time_base);
+                        _avPacket.dts = _avPacket.pts;
+                    //}
                     
                     //QTFFAppLog(@"Pre-writing audio pts: %lld", _avPacket.pts);
                     
@@ -923,12 +981,15 @@
                         // release resources
                         [self releaseAudioMemory];
                         
+                        // release the packet
+                        av_free_packet(&_avPacket);
+                        
                         return NO;
                     }
+                    
+                    // release the packet
+                    av_free_packet(&_avPacket);
                 }
-                
-                // release resources
-                //[self releaseAudioMemory];
                 
                 return YES;
             }
@@ -1205,6 +1266,7 @@
     _sourceSampleFormat = -1;
     _sourceNumberOfSamples = -1;
     _sourceLineSize = -1;
+    _sourceData = NULL;
     
     // release the destination data
     if (_destinationData)
@@ -1220,6 +1282,7 @@
     _destinationSampleFormat = -1;
     _destinationNumberOfSamples = -1;
     _destinationLineSize = -1;
+    _destinationData = NULL;
     
     // release the resampler context
     swr_free(&_resamplerCtx);
