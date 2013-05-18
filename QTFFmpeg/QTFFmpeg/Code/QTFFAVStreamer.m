@@ -79,6 +79,36 @@
 
 @implementation QTFFAVStreamer
 
+#pragma mark - Initialization 
+
+- (id)init;
+{
+    self = [super init];
+    
+    if (self)
+    {
+        // audio source data variables
+        _sourceNumberOfChannels = -1;
+        _sourceChannelLayout = -1;
+        _sourceSampleRate = -1;
+        _sourceSampleFormat = -1;
+        _sourceNumberOfSamples = -1;
+        _sourceLineSize = -1;
+        _sourceData = NULL;
+        
+        // audio destination data variables
+        _destinationNumberOfChannels = -1;
+        _destinationChannelLayout = -1;
+        _destinationSampleRate = -1;
+        _destinationSampleFormat = -1;
+        _destinationNumberOfSamples = -1;
+        _destinationLineSize = -1;
+        _destinationData = NULL;
+    }
+    
+    return self;
+}
+
 #pragma mark - Stream opening and closing
 
 - (BOOL)openStream:(NSError **)error;
@@ -631,27 +661,6 @@
                 // get the codec context
                 AVCodecContext *codecCtx = _audioStream->codec;
                 
-                /*
-                 QTFFAppLog(@"%@", sampleBuffer.formatDescription.localizedFormatSummary);
-                 QTFFAppLog(@"Sample rate:  %f", sampleBuffer.sampleRate);
-                 QTFFAppLog(@"Bytes per packet:  %d", sampleBuffer.bytesPerPacket);
-                 QTFFAppLog(@"Frames per packet:  %d", sampleBuffer.framesPerPacket);
-                 QTFFAppLog(@"Bytes per frame:  %d", sampleBuffer.bytesPerFrame);
-                 QTFFAppLog(@"Channels per frame: %d", sampleBuffer.channelsPerFrame);
-                 QTFFAppLog(@"Bits per channel: %d", sampleBuffer.bitsPerChannel);
-                 QTFFAppLog(@"Number of samples: %ld", (unsigned long)sampleBuffer.numberOfSamples);
-                 QTFFAppLog(@"Is float? %@", sampleBuffer.isFloat ? @"YES" : @"NO");
-                 QTFFAppLog(@"Is big endian? %@", sampleBuffer.isBigEndian ? @"YES" : @"NO");
-                 QTFFAppLog(@"Is little endian? %@", sampleBuffer.isLittleEndian ? @"YES" : @"NO");
-                 QTFFAppLog(@"Is non-mixable? %@", sampleBuffer.isNonMixable ? @"YES" : @"NO");
-                 QTFFAppLog(@"Is aligned high? %@", sampleBuffer.isAlignedHigh ? @"YES" : @"NO");
-                 QTFFAppLog(@"Is packed? %@", sampleBuffer.isPacked ? @"YES" : @"NO");
-                 QTFFAppLog(@"Is non-interleaved? %@", sampleBuffer.isNonInterleaved ? @"YES" : @"NO");
-                 QTFFAppLog(@"Is interleaved? %@", sampleBuffer.isInterleaved ? @"YES" : @"NO");
-                 QTFFAppLog(@"Is signed integer? %@", sampleBuffer.isSignedInteger ? @"YES" : @"NO");
-                 QTFFAppLog(@"Is unsigned integer? %@", sampleBuffer.isUnsignedInteger ? @"YES" : @"NO");
-                 */
-                
                 // source data variables
                 
                 // determine sample format
@@ -688,6 +697,25 @@
                     _sourceSampleFormat != sourceSampleFormat ||
                     _sourceNumberOfSamples != (int)(sampleBuffer.numberOfSamples))
                 {
+                     QTFFAppLog(@"Audio - %@", sampleBuffer.formatDescription.localizedFormatSummary);
+                     QTFFAppLog(@"Audio - Sample rate:  %f", sampleBuffer.sampleRate);
+                     QTFFAppLog(@"Audio - Bytes per packet:  %d", sampleBuffer.bytesPerPacket);
+                     QTFFAppLog(@"Audio - Frames per packet:  %d", sampleBuffer.framesPerPacket);
+                     QTFFAppLog(@"Audio - Bytes per frame:  %d", sampleBuffer.bytesPerFrame);
+                     QTFFAppLog(@"Audio - Channels per frame: %d", sampleBuffer.channelsPerFrame);
+                     QTFFAppLog(@"Audio - Bits per channel: %d", sampleBuffer.bitsPerChannel);
+                     QTFFAppLog(@"Audio - Number of samples: %ld", (unsigned long)sampleBuffer.numberOfSamples);
+                     QTFFAppLog(@"Audio - Is float? %@", sampleBuffer.isFloat ? @"YES" : @"NO");
+                     QTFFAppLog(@"Audio - Is big endian? %@", sampleBuffer.isBigEndian ? @"YES" : @"NO");
+                     QTFFAppLog(@"Audio - Is little endian? %@", sampleBuffer.isLittleEndian ? @"YES" : @"NO");
+                     QTFFAppLog(@"Audio - Is non-mixable? %@", sampleBuffer.isNonMixable ? @"YES" : @"NO");
+                     QTFFAppLog(@"Audio - Is aligned high? %@", sampleBuffer.isAlignedHigh ? @"YES" : @"NO");
+                     QTFFAppLog(@"Audio - Is packed? %@", sampleBuffer.isPacked ? @"YES" : @"NO");
+                     QTFFAppLog(@"Audio - Is non-interleaved? %@", sampleBuffer.isNonInterleaved ? @"YES" : @"NO");
+                     QTFFAppLog(@"Audio - Is interleaved? %@", sampleBuffer.isInterleaved ? @"YES" : @"NO");
+                     QTFFAppLog(@"Audio - Is signed integer? %@", sampleBuffer.isSignedInteger ? @"YES" : @"NO");
+                     QTFFAppLog(@"Audio - Is unsigned integer? %@", sampleBuffer.isUnsignedInteger ? @"YES" : @"NO");
+                    
                     // release existing resources
                     [self releaseAudioMemory];
                     
