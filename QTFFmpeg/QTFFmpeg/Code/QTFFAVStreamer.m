@@ -896,17 +896,19 @@
                     return NO;
                 }
                 
-                int bufferSize = av_samples_get_buffer_size(&_destinationLineSize,
-                                                            _destinationNumberOfChannels,
-                                                            _destinationNumberOfSamples,
-                                                            _destinationSampleFormat,
+                /*
+                int bufferSize = av_samples_get_buffer_size(&_sourceLineSize,
+                                                            _sourceNumberOfChannels,
+                                                            _sourceNumberOfSamples,
+                                                            _sourceSampleFormat,
                                                             0);
                 
-                _streamAudioFrame->nb_samples = _destinationNumberOfSamples;
-                _streamAudioFrame->format = codecCtx->sample_fmt;
-                _streamAudioFrame->channel_layout = codecCtx->channel_layout;
-                _streamAudioFrame->channels = codecCtx->channels;
-                _streamAudioFrame->sample_rate = codecCtx->sample_rate;
+                _streamAudioFrame->nb_samples = _sourceNumberOfSamples;
+                _streamAudioFrame->format = _sourceSampleFormat;
+                _streamAudioFrame->channel_layout = _sourceChannelLayout;
+                _streamAudioFrame->channels = _sourceNumberOfChannels;
+                _streamAudioFrame->sample_rate = _sourceSampleRate;
+                */
                 
                 //                QTFFAppLog(@"Source number of channels: %d", sourceNumberOfChannels);
                 //                QTFFAppLog(@"Destination number of channels: %d", destinationNumberOfChannels);
@@ -926,107 +928,110 @@
                 //                QTFFAppLog(@"Destination number of samples: %d", destinationNumberOfSamples);
                 //                QTFFAppLog(@"_streamAudioFrame->nb_samples = %d", _streamAudioFrame->nb_samples);
                 
-                returnVal = avcodec_fill_audio_frame(_streamAudioFrame,
-                                                     _streamAudioFrame->channels,
-                                                     _streamAudioFrame->format,
-                                                     (const uint8_t *)_destinationData[0],
-                                                     bufferSize,
-                                                     0);
+                int sampleIndex = 0;
+                int frameNumberOfSamples = 0;
+                int totalNumberOfSamplesLeftToEncode = _destinationNumberOfSamples;
                 
-                if (returnVal < 0)
+                while (totalNumberOfSamplesLeftToEncode > 0)
                 {
-                    if (error)
+                    if (sampleIndex > 0)
+                        break;
+                    
+                    if (totalNumberOfSamplesLeftToEncode <= codecCtx->frame_size)
                     {
-                        *error = [NSError errorWithDomain:QTFFVideoErrorDomain
-                                                     code:QTFFErrorCode_VideoStreamingError
-                                              description:[NSString stringWithFormat:@"Unable to fill the audio frame with captured audio data, error: %d", returnVal]];
+                        frameNumberOfSamples = totalNumberOfSamplesLeftToEncode;
+                    }
+                    else
+                    {
+                        frameNumberOfSamples = codecCtx->frame_size;
                     }
                     
-                    // release resources
-                    [self releaseAudioMemory];
+                    int bufferSize = av_samples_get_buffer_size(&_destinationLineSize,
+                                                                _destinationNumberOfChannels,
+                                                                frameNumberOfSamples,
+                                                                _destinationSampleFormat,
+                                                                0);
                     
-                    return NO;
-                }
-                
-                // encode the audio frame, fill a packet for streaming
-                _avPacket.data = NULL;
-                _avPacket.size = 0;
-                int gotPacket;
-                
-                //                 QTFFAppLog(@"Audio frame decode time: %lld", sampleBuffer.decodeTime.timeValue);
-                //                 QTFFAppLog(@"Audio frame decode time scale: %ld", sampleBuffer.decodeTime.timeScale);
-                //                 QTFFAppLog(@"Audio frame presentation time: %lld", sampleBuffer.presentationTime.timeValue);
-                //                 QTFFAppLog(@"Audio frame presentation time scale: %ld", sampleBuffer.presentationTime.timeScale);
-                //                 QTFFAppLog(@"Audio frame duration time: %lld", sampleBuffer.duration.timeValue);
-                //                 QTFFAppLog(@"Audio frame duration time scale: %ld", sampleBuffer.duration.timeScale);
-                
-                // calcuate the pts from last pts to the current presentation time
-                
-                // current presentation time
-                double currentCapturedAudioFramePresentationTime = 0.0;
-                
-                if (! _hasFirstSampleBufferAudioFrame)
-                {
-                    _hasFirstSampleBufferAudioFrame = YES;
-                    _firstSampleBufferAudioFramePresentationTime = (double)sampleBuffer.presentationTime.timeValue / (double)sampleBuffer.presentationTime.timeScale;
-                    _capturedAudioFramePts = 0;
-                }
-                else
-                {
-                    currentCapturedAudioFramePresentationTime = ((double)sampleBuffer.presentationTime.timeValue / (double)sampleBuffer.presentationTime.timeScale) - _firstSampleBufferAudioFramePresentationTime;
-                    _capturedAudioFramePts += (currentCapturedAudioFramePresentationTime - _lastCapturedAudioFramePresentationTime) / _audioTimeBaseUnit;
-                }
-                
-                //                 QTFFAppLog(@"First audio sample buffer presentation time: %f", _firstSampleBufferAudioFramePresentationTime);
-                //                 QTFFAppLog(@"Last audio presentation time: %f", _lastCapturedAudioFramePresentationTime);
-                //                 QTFFAppLog(@"Current audio presentation time: %f", currentCapturedAudioFramePresentationTime);
-                
-                _lastCapturedAudioFramePresentationTime = currentCapturedAudioFramePresentationTime;
-                
-                _avPacket.pts = _capturedAudioFramePts;
-                _avPacket.dts = _avPacket.pts;
-                
-                //QTFFAppLog(@"Pre-encoding audio pts: %lld", _capturedAudioFramePts);
-                
-                // encode the audio
-                returnVal = avcodec_encode_audio2(codecCtx, &_avPacket, _streamAudioFrame, &gotPacket);
-                
-//                QTFFAppLog(@"Codec context frame size: %d", codecCtx->frame_size);
-//                QTFFAppLog(@"Frame number of samples: %d", _streamAudioFrame->nb_samples);
-                
-                if (returnVal != 0)
-                {
-                    if (error)
+                    _streamAudioFrame->nb_samples = frameNumberOfSamples;
+                    _streamAudioFrame->format = codecCtx->sample_fmt;
+                    _streamAudioFrame->channel_layout = codecCtx->channel_layout;
+                    _streamAudioFrame->channels = codecCtx->channels;
+                    _streamAudioFrame->sample_rate = codecCtx->sample_rate;
+                    
+                    float *sampleData = (float *)_destinationData[0];
+                    returnVal = avcodec_fill_audio_frame(_streamAudioFrame,
+                                                         _streamAudioFrame->channels,
+                                                         _streamAudioFrame->format,
+                                                         //                                                     (const uint8_t *)_destinationData[0],
+                                                         (const uint8_t *)&sampleData[sampleIndex],
+                                                         bufferSize,
+                                                         0);
+                    
+                    if (returnVal < 0)
                     {
-                        *error = [NSError errorWithDomain:QTFFVideoErrorDomain
-                                                     code:QTFFErrorCode_VideoStreamingError
-                                              description:[NSString stringWithFormat:@"Unable to encode the audio frame, error: %d", returnVal]];
+                        if (error)
+                        {
+                            *error = [NSError errorWithDomain:QTFFVideoErrorDomain
+                                                         code:QTFFErrorCode_VideoStreamingError
+                                                  description:[NSString stringWithFormat:@"Unable to fill the audio frame with captured audio data, error: %d", returnVal]];
+                        }
+                        
+                        // release resources
+                        [self releaseAudioMemory];
+                        
+                        return NO;
                     }
                     
-                    // release resources
-                    [self releaseAudioMemory];
+                    sampleIndex += frameNumberOfSamples;
+                    totalNumberOfSamplesLeftToEncode -= frameNumberOfSamples;
                     
-                    return NO;
-                }
-                
-                // if a packet was returned, write it to the network stream. The codec may take several calls before returning a packet.
-                // only when there is a full packet returned for streaming should writing be attempted.
-                if (gotPacket == 1)
-                {
-                    //if (! _hasCodecCapDelay)
-                    //{
-                    _avPacket.pts = av_rescale_q(_capturedAudioFramePts, codecCtx->time_base, _audioStream->time_base);
+                    QTFFAppLog(@"Encoding audio, # samples: %d, # samples left in this buffer (after these) to encode: %d", frameNumberOfSamples, totalNumberOfSamplesLeftToEncode);
+                    
+                    // encode the audio frame, fill a packet for streaming
+                    _avPacket.data = NULL;
+                    _avPacket.size = 0;
+                    int gotPacket;
+                    
+                    //                 QTFFAppLog(@"Audio frame decode time: %lld", sampleBuffer.decodeTime.timeValue);
+                    //                 QTFFAppLog(@"Audio frame decode time scale: %ld", sampleBuffer.decodeTime.timeScale);
+                    //                 QTFFAppLog(@"Audio frame presentation time: %lld", sampleBuffer.presentationTime.timeValue);
+                    //                 QTFFAppLog(@"Audio frame presentation time scale: %ld", sampleBuffer.presentationTime.timeScale);
+                    //                 QTFFAppLog(@"Audio frame duration time: %lld", sampleBuffer.duration.timeValue);
+                    //                 QTFFAppLog(@"Audio frame duration time scale: %ld", sampleBuffer.duration.timeScale);
+                    
+                    // calcuate the pts from last pts to the current presentation time
+                    
+                    // current presentation time
+                    double currentCapturedAudioFramePresentationTime = 0.0;
+                    
+                    if (! _hasFirstSampleBufferAudioFrame)
+                    {
+                        _hasFirstSampleBufferAudioFrame = YES;
+                        _firstSampleBufferAudioFramePresentationTime = (double)sampleBuffer.presentationTime.timeValue / (double)sampleBuffer.presentationTime.timeScale;
+                        _capturedAudioFramePts = 0;
+                    }
+                    else
+                    {
+                        currentCapturedAudioFramePresentationTime = ((double)sampleBuffer.presentationTime.timeValue / (double)sampleBuffer.presentationTime.timeScale) - _firstSampleBufferAudioFramePresentationTime;
+                        _capturedAudioFramePts += (currentCapturedAudioFramePresentationTime - _lastCapturedAudioFramePresentationTime) / _audioTimeBaseUnit;
+                    }
+                    
+                    //                 QTFFAppLog(@"First audio sample buffer presentation time: %f", _firstSampleBufferAudioFramePresentationTime);
+                    //                 QTFFAppLog(@"Last audio presentation time: %f", _lastCapturedAudioFramePresentationTime);
+                    //                 QTFFAppLog(@"Current audio presentation time: %f", currentCapturedAudioFramePresentationTime);
+                    
+                    _lastCapturedAudioFramePresentationTime = currentCapturedAudioFramePresentationTime;
+                    
+                    _avPacket.pts = _capturedAudioFramePts;
                     _avPacket.dts = _avPacket.pts;
-                    //}
                     
-                    //QTFFAppLog(@"Pre-writing audio pts: %lld", _avPacket.pts);
+                    //QTFFAppLog(@"Pre-encoding audio pts: %lld", _capturedAudioFramePts);
                     
-                    _avPacket.flags |= AV_PKT_FLAG_KEY;
-                    _avPacket.stream_index = _audioStream->index;
+                    // encode the audio
+                    returnVal = avcodec_encode_audio2(codecCtx, &_avPacket, _streamAudioFrame, &gotPacket);
                     
-                    // write the frame
-                    returnVal = av_interleaved_write_frame(_avOutputFormatContext, &_avPacket);
-                    //returnVal = av_write_frame(_avOutputFormatContext, &_avPacket);
+                    //                QTFFAppLog(@"Codec context frame size: %d", codecCtx->frame_size);
+                    //                QTFFAppLog(@"Frame number of samples: %d", _streamAudioFrame->nb_samples);
                     
                     if (returnVal != 0)
                     {
@@ -1034,20 +1039,55 @@
                         {
                             *error = [NSError errorWithDomain:QTFFVideoErrorDomain
                                                          code:QTFFErrorCode_VideoStreamingError
-                                                  description:[NSString stringWithFormat:@"Unable to write the audio frame to the stream, error: %d", returnVal]];
+                                                  description:[NSString stringWithFormat:@"Unable to encode the audio frame, error: %d", returnVal]];
                         }
                         
                         // release resources
                         [self releaseAudioMemory];
                         
-                        // release the packet
-                        av_free_packet(&_avPacket);
-                        
                         return NO;
                     }
                     
-                    // release the packet
-                    av_free_packet(&_avPacket);
+                    // if a packet was returned, write it to the network stream. The codec may take several calls before returning a packet.
+                    // only when there is a full packet returned for streaming should writing be attempted.
+                    if (gotPacket == 1)
+                    {
+                        //if (! _hasCodecCapDelay)
+                        //{
+                        _avPacket.pts = av_rescale_q(_capturedAudioFramePts, codecCtx->time_base, _audioStream->time_base);
+                        _avPacket.dts = _avPacket.pts;
+                        //}
+                        
+                        //QTFFAppLog(@"Pre-writing audio pts: %lld", _avPacket.pts);
+                        
+                        _avPacket.flags |= AV_PKT_FLAG_KEY;
+                        _avPacket.stream_index = _audioStream->index;
+                        
+                        // write the frame
+                        returnVal = av_interleaved_write_frame(_avOutputFormatContext, &_avPacket);
+                        //returnVal = av_write_frame(_avOutputFormatContext, &_avPacket);
+                        
+                        if (returnVal != 0)
+                        {
+                            if (error)
+                            {
+                                *error = [NSError errorWithDomain:QTFFVideoErrorDomain
+                                                             code:QTFFErrorCode_VideoStreamingError
+                                                      description:[NSString stringWithFormat:@"Unable to write the audio frame to the stream, error: %d", returnVal]];
+                            }
+                            
+                            // release resources
+                            [self releaseAudioMemory];
+                            
+                            // release the packet
+                            av_free_packet(&_avPacket);
+                            
+                            return NO;
+                        }
+                        
+                        // release the packet
+                        av_free_packet(&_avPacket);
+                    }
                 }
                 
                 return YES;
