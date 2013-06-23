@@ -124,7 +124,7 @@
     double timeBaseScale = (double)timeBaseDen / (double)currentTime.timeScale;
     int64_t ffmpegTime = (whole * timeBaseDen) + ((double)mod * timeBaseScale);
     
-    NSLog(@"FFmpeg presentation time: %lld", ffmpegTime);
+    //NSLog(@"FFmpeg presentation time: %lld", ffmpegTime);
     return ffmpegTime;
 }
 
@@ -137,7 +137,7 @@
     double timeBaseScale = (double)timeBaseDen / (double)currentTime.timeScale;
     int64_t ffmpegTime = (whole * timeBaseDen) + ((double)mod * timeBaseScale);
     
-    NSLog(@"FFmpeg decode time: %lld", ffmpegTime);
+    //NSLog(@"FFmpeg decode time: %lld", ffmpegTime);
     return ffmpegTime;
 }
 
@@ -148,7 +148,7 @@
     double timeBaseScale = (double)timeBaseDen / (double)self.duration.timeScale;
     int64_t ffmpegTime = (whole * timeBaseDen) + ((double)mod * timeBaseScale);
     
-    NSLog(@"FFmpeg duration time: %lld", ffmpegTime);
+    //NSLog(@"FFmpeg duration time: %lld", ffmpegTime);
     return ffmpegTime;
 }
 

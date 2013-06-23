@@ -49,7 +49,6 @@
     struct SwrContext *_resamplerCtx;
     
     // audio encoding
-    double _audioTimeBaseUnit;
     BOOL _hasFirstSampleBufferAudioFrame;
     QTTime _firstSampleBufferAudioFramePresentationTime;
     int64_t _capturedAudioFramePts;
@@ -57,16 +56,14 @@
     // video variables
     AVStream *_videoStream;
     AVFrame *_inputVideoFrame;
-    AVFrame *_lastStreamVideoFrame;
-    AVFrame *_currentStreamVideoFrame;
+    AVFrame *_outputVideoFrame;
     
     // image convert context
     struct SwsContext *_imgConvertCtx;
     
     // video encoding
-    double _videoTimeBaseUnit;
     BOOL _hasFirstSampleBufferVideoFrame;
-    double _firstSampleBufferVideoFramePresentationTime;
+    QTTime _firstSampleBufferVideoFramePresentationTime;
     int64_t _capturedVideoFramePts;
     
     // output
@@ -153,7 +150,6 @@
                             }
                             
                             _hasFirstSampleBufferAudioFrame = NO;
-                            //_firstSampleBufferAudioFramePresentationTime = {};
                             _capturedAudioFramePts = -1;
                         }
                         
@@ -167,7 +163,6 @@
                             }
                             
                             _hasFirstSampleBufferVideoFrame = NO;
-                            _firstSampleBufferVideoFramePresentationTime = 0.0;
                             _capturedVideoFramePts = -1;
                         }
                         
@@ -394,7 +389,6 @@
     //QTFFAppLog(@"Audio codec frame size: %d", audioCodecCtx->frame_size);
     
     _hasAudioCodecCapDelay = audioCodecCtx->codec->capabilities & CODEC_CAP_DELAY;
-    _audioTimeBaseUnit = ((double)audioCodecCtx->time_base.num / (double)audioCodecCtx->time_base.den);
     
     // initialize the output audio frame
     _streamAudioFrame = avcodec_alloc_frame();
@@ -519,7 +513,6 @@
     videoCodecCtx->bit_rate = bitRate;
     videoCodecCtx->time_base.den = config.videoCodecFrameRate;
     videoCodecCtx->time_base.num = 1;
-    _videoTimeBaseUnit = ((double)videoCodecCtx->time_base.num / (double)videoCodecCtx->time_base.den);
     
     // open the video codec
     if (avcodec_open2(videoCodecCtx, videoCodec, NULL) < 0)
@@ -540,13 +533,9 @@
                                                 height:videoCodecCtx->height];
     
     // initialize the output video frame
-    _currentStreamVideoFrame = [self videoFrameWithPixelFormat:videoCodecCtx->pix_fmt
-                                                         width:videoCodecCtx->width
-                                                        height:videoCodecCtx->height];
-    
-    _lastStreamVideoFrame = [self videoFrameWithPixelFormat:videoCodecCtx->pix_fmt
-                                                      width:videoCodecCtx->width
-                                                     height:videoCodecCtx->height];
+    _outputVideoFrame = [self videoFrameWithPixelFormat:videoCodecCtx->pix_fmt
+                                                  width:videoCodecCtx->width
+                                                 height:videoCodecCtx->height];
     
     return YES;
 }
@@ -554,6 +543,7 @@
 - (void)closeVideoStream;
 {
     sws_freeContext(_imgConvertCtx);
+    _imgConvertCtx = NULL;
     
     if (_videoStream)
     {
@@ -565,14 +555,9 @@
         av_frame_free(&_inputVideoFrame);
     }
     
-    if (_lastStreamVideoFrame)
+    if (_outputVideoFrame)
     {
-        av_frame_free(&_lastStreamVideoFrame);
-    }
-    
-    if (_currentStreamVideoFrame)
-    {
-        av_frame_free(&_currentStreamVideoFrame);
+        av_frame_free(&_outputVideoFrame);
     }
 }
 
@@ -702,7 +687,7 @@
                     _sourceSampleRate != sampleBuffer.sampleRate ||
                     _sourceSampleFormat != sourceSampleFormat ||
                     _sourceNumberOfSamples != (int)(sampleBuffer.numberOfSamples))
-                {                    
+                {
                     // release existing resources
                     [self releaseAudioMemory];
                     
@@ -793,7 +778,7 @@
                     
                     _destinationNumberOfSamples = (int)av_rescale_rnd(swr_get_delay(_resamplerCtx, _sourceSampleRate) + _sourceNumberOfSamples, _destinationSampleRate, _sourceSampleRate, AV_ROUND_UP);
                     //QTFFAppLog(@"Calculated destination samples: %d, codec destination samples: %d", _destinationNumberOfSamples, codecCtx->frame_size);
-                                        
+                    
                     // allocate the destination samples buffer
                     returnVal = av_samples_alloc_array_and_samples(&_destinationData,
                                                                    &_destinationLineSize,
@@ -933,8 +918,7 @@
                     _avPacket.pts = _capturedAudioFramePts;
                     _avPacket.dts = _avPacket.pts;
                     _avPacket.duration = frameNumberOfSamples;
-                    //_avPacket.duration = (double)duration * ((double)frameNumberOfSamples / (double)sampleBuffer.numberOfSamples);
-                
+                    
                     //QTFFAppLog(@"Pre-encoding audio pts: %lld", _avPacket.pts);
                     //QTFFAppLog(@"Pre-encoding audio duration: %d", _avPacket.duration);
                     
@@ -1098,57 +1082,42 @@
                 
                 // convert the input frame to an output frame for streaming
                 sws_scale(_imgConvertCtx, (const u_int8_t* const*)_inputVideoFrame->data, _inputVideoFrame->linesize,
-                          0, codecCtx->height, _currentStreamVideoFrame->data, _currentStreamVideoFrame->linesize);
+                          0, codecCtx->height, _outputVideoFrame->data, _outputVideoFrame->linesize);
                 
                 // calcuate the pts from last pts to the current presentation time
-                
-                // current presentation time
-                double currentCapturedVideoFramePresentationTime = 0.0;
                 
                 if (! _hasFirstSampleBufferVideoFrame)
                 {
                     _hasFirstSampleBufferVideoFrame = YES;
-                    _firstSampleBufferVideoFramePresentationTime = (double)sampleBuffer.presentationTime.timeValue / (double)sampleBuffer.presentationTime.timeScale;
+                    _firstSampleBufferVideoFramePresentationTime = sampleBuffer.presentationTime;
+                    _capturedVideoFramePts = 0;
                 }
                 else
                 {
-                    currentCapturedVideoFramePresentationTime = ((double)sampleBuffer.presentationTime.timeValue / (double)sampleBuffer.presentationTime.timeScale) - _firstSampleBufferVideoFramePresentationTime;
+                    _capturedVideoFramePts = [sampleBuffer FFmpegPTSWithStartingPresentationTime:_firstSampleBufferVideoFramePresentationTime timeBaseDen:codecCtx->time_base.den];
                 }
                 
-                int numberOfNewFramesToBeInserted = 0;
-                int numberOfOldFramesToBeInserted = 0;
+                //QTFFAppLog(@"Captured video frame pts: %lld", _capturedVideoFramePts);
+                long duration = [sampleBuffer FFmpegDurationWithTimeBaseDen:codecCtx->time_base.den];
+                //QTFFAppLog(@"Captured video frame duration: %ld", duration);
                 
-                double lastCapturedVideoFramePresentationTime = _capturedVideoFramePts * _videoTimeBaseUnit;
-                
-                // calculate old frames to be inserted
-                numberOfOldFramesToBeInserted = MAX(0, (int)((currentCapturedVideoFramePresentationTime - lastCapturedVideoFramePresentationTime) / _videoTimeBaseUnit) - 1);
-                
-                // calculate new frames to be inserted
-                double durationTime = (double)sampleBuffer.duration.timeValue / (double)sampleBuffer.duration.timeScale;
-                numberOfNewFramesToBeInserted = (int)(durationTime / _videoTimeBaseUnit);
-                
-                int totalNumberOfFramesToBeInserted = numberOfOldFramesToBeInserted + numberOfNewFramesToBeInserted;
-                
-                //QTFFAppLog(@"Encoding %d old video frames", numberOfOldFramesToBeInserted);
-                //QTFFAppLog(@"Encoding %d new video frames", numberOfNewFramesToBeInserted);
-                
-                for (int i = 0; i < totalNumberOfFramesToBeInserted; i++)
+                for (int i = 0; i < duration; i++)
                 {
                     // encode the video frame, fill a packet for streaming
                     _avPacket.data = NULL;
                     _avPacket.size = 0;
                     int gotPacket;
                     
-                    _avPacket.pts = ++_capturedVideoFramePts;
+                    _capturedAudioFramePts += i;
+                    _avPacket.pts = _capturedVideoFramePts;
                     _avPacket.dts = _avPacket.pts;
+                    _avPacket.duration = 1;
                     
-                    //QTFFAppLog(@"Pre-encoding video pts: %lld", _capturedVideoFramePts);
-                    
-                    // set the frame to use
-                    AVFrame *theFrame = i < numberOfOldFramesToBeInserted ? _lastStreamVideoFrame : _currentStreamVideoFrame;
+                    QTFFAppLog(@"Pre-encoding video pts: %lld", _avPacket.pts);
+                    QTFFAppLog(@"Pre-encoding video duration: %d", _avPacket.duration);
                     
                     // encoding
-                    returnVal = avcodec_encode_video2(codecCtx, &_avPacket, theFrame, &gotPacket);
+                    returnVal = avcodec_encode_video2(codecCtx, &_avPacket, _outputVideoFrame, &gotPacket);
                     
                     if (returnVal != 0)
                     {
@@ -1205,10 +1174,6 @@
                         av_free_packet(&_avPacket);
                     }
                 }
-                
-                AVFrame *tempFrame = _lastStreamVideoFrame;
-                _lastStreamVideoFrame = _currentStreamVideoFrame;
-                _currentStreamVideoFrame = tempFrame;
                 
                 return YES;
             }
