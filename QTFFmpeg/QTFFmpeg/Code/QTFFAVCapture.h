@@ -34,6 +34,8 @@
                                             error:(NSError **)error;
 - (void)stopAudioCapture;
 
+- (int)currentAudioCaptureDeviceNumberOfChannels;
+
 #pragma mark - Video Devices
 
 + (NSArray *)availableVideoCaptureDevices:(BOOL)includeBuiltInCamera;

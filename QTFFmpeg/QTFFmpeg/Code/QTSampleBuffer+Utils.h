@@ -31,4 +31,13 @@
 @property (nonatomic, readonly) BOOL isSignedInteger;
 @property (nonatomic, readonly) BOOL isUnsignedInteger;
 
+#pragma mark - Timing 
+
+- (int64_t)FFmpegPTSWithStartingPresentationTime:(QTTime)startingPresentationTime timeBaseDen:(int)timeBaseDen;
+- (int64_t)FFmpegDurationWithTimeBaseDen:(int)timeBaseDen;
+
+#pragma mark - Log output
+
+- (void)logInfo;
+
 @end

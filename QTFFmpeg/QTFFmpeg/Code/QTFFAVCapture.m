@@ -116,6 +116,22 @@ static NSString * const kBuiltInVideoCamera2 = @"Built-in iSight";
     [self initAudioState];
 }
 
+- (int)currentAudioCaptureDeviceNumberOfChannels;
+{
+    if (_audioCaptureOutput)
+    {
+        QTCaptureConnection *connection = (QTCaptureConnection *)_audioCaptureOutput.connections[0];
+        NSValue *asbdValue = [connection.formatDescription attributeForKey:QTFormatDescriptionAudioStreamBasicDescriptionAttribute];
+        AudioStreamBasicDescription asbd = {0};
+        [asbdValue getValue:&asbd];
+        return asbd.mChannelsPerFrame;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 #pragma mark - Video Devices
 
 + (NSArray *)availableVideoCaptureDevices:(BOOL)includeBuiltInCamera;

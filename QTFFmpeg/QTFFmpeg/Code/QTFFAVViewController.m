@@ -520,6 +520,13 @@
         // start the stream
         QTFFAppLog(@"Starting streaming...");
         
+        QTFFAVConfig *config = [QTFFAVConfig sharedConfig];
+        if (config.shouldStreamAudio)
+        {
+            // set the audio number of channels
+            config.audioCodecNumberOfChannels = _avCapture.currentAudioCaptureDeviceNumberOfChannels;
+        }
+        
         NSError *error = nil;
         BOOL success = [_avStreamer openStream:&error];
         
