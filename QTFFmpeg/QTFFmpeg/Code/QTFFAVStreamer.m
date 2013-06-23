@@ -1100,13 +1100,6 @@
                 sws_scale(_imgConvertCtx, (const u_int8_t* const*)_inputVideoFrame->data, _inputVideoFrame->linesize,
                           0, codecCtx->height, _currentStreamVideoFrame->data, _currentStreamVideoFrame->linesize);
                 
-                //QTFFAppLog(@"Video frame decode time: %lld", sampleBuffer.decodeTime.timeValue);
-                //QTFFAppLog(@"Video frame decode time scale: %ld", sampleBuffer.decodeTime.timeScale);
-                //QTFFAppLog(@"Video frame presentation time: %lld", sampleBuffer.presentationTime.timeValue);
-                //QTFFAppLog(@"Video frame presentation time scale: %ld", sampleBuffer.presentationTime.timeScale);
-                //QTFFAppLog(@"Video frame duration time: %lld", sampleBuffer.duration.timeValue);
-                //QTFFAppLog(@"Video frame duration time scale: %ld", sampleBuffer.duration.timeScale);
-                
                 // calcuate the pts from last pts to the current presentation time
                 
                 // current presentation time
