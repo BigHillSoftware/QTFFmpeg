@@ -33,7 +33,8 @@
 
 #pragma mark - Timing 
 
-- (int64_t)FFmpegPTSWithStartingPresentationTime:(QTTime)startingPresentationTime timeBaseDen:(int)timeBaseDen;
+- (int64_t)FFmpegPTSWithStartingPresentationTime:(QTTime)startingTime timeBaseDen:(int)timeBaseDen;
+- (int64_t)FFmpegDTSWithStartingDecodeTime:(QTTime)startingTime timeBaseDen:(int)timeBaseDen;
 - (int64_t)FFmpegDurationWithTimeBaseDen:(int)timeBaseDen;
 
 #pragma mark - Log output

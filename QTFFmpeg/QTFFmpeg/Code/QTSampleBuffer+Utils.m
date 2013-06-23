@@ -115,25 +115,38 @@
 
 #pragma mark - FFmpeg methods
 
-- (int64_t)FFmpegPTSWithStartingPresentationTime:(QTTime)startingPresentationTime timeBaseDen:(int)timeBaseDen;
+- (int64_t)FFmpegPTSWithStartingPresentationTime:(QTTime)startingTime timeBaseDen:(int)timeBaseDen;
 {
-    QTTime currentPresentationTime = self.presentationTime;
-    long netTimeValue = currentPresentationTime.timeValue - startingPresentationTime.timeValue;
-    long netWhole = netTimeValue / currentPresentationTime.timeScale;
-    long netMod = netTimeValue % currentPresentationTime.timeScale;
-    double timeBaseScale = (double)timeBaseDen / (double)self.presentationTime.timeScale;
-    int64_t ffmpegTime = (netWhole * timeBaseDen) + ((double)netMod * timeBaseScale);
+    QTTime currentTime = self.presentationTime;
+    long netTimeValue = currentTime.timeValue - startingTime.timeValue;
+    long whole = netTimeValue / currentTime.timeScale;
+    long mod = netTimeValue % currentTime.timeScale;
+    double timeBaseScale = (double)timeBaseDen / (double)currentTime.timeScale;
+    int64_t ffmpegTime = (whole * timeBaseDen) + ((double)mod * timeBaseScale);
     
     NSLog(@"FFmpeg presentation time: %lld", ffmpegTime);
     return ffmpegTime;
 }
 
+- (int64_t)FFmpegDTSWithStartingDecodeTime:(QTTime)startingTime timeBaseDen:(int)timeBaseDen;
+{
+    QTTime currentTime = self.decodeTime;
+    long netTimeValue = currentTime.timeValue - startingTime.timeValue;
+    long whole = netTimeValue / currentTime.timeScale;
+    long mod = netTimeValue % currentTime.timeScale;
+    double timeBaseScale = (double)timeBaseDen / (double)currentTime.timeScale;
+    int64_t ffmpegTime = (whole * timeBaseDen) + ((double)mod * timeBaseScale);
+    
+    NSLog(@"FFmpeg decode time: %lld", ffmpegTime);
+    return ffmpegTime;
+}
+
 - (int64_t)FFmpegDurationWithTimeBaseDen:(int)timeBaseDen;
 {
-    long durationWhole = self.duration.timeValue / self.duration.timeScale;
-    long durationMod = self.duration.timeValue % self.duration.timeScale;
+    long whole = self.duration.timeValue / self.duration.timeScale;
+    long mod = self.duration.timeValue % self.duration.timeScale;
     double timeBaseScale = (double)timeBaseDen / (double)self.duration.timeScale;
-    int64_t ffmpegTime = (durationWhole * timeBaseDen) + ((double)durationMod * timeBaseScale);
+    int64_t ffmpegTime = (whole * timeBaseDen) + ((double)mod * timeBaseScale);
     
     NSLog(@"FFmpeg duration time: %lld", ffmpegTime);
     return ffmpegTime;

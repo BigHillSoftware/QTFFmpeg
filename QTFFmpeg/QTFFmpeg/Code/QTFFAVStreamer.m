@@ -664,7 +664,7 @@
                 // determine sample format
                 enum AVSampleFormat sourceSampleFormat;
                 
-                [sampleBuffer logInfo];
+                //[sampleBuffer logInfo];
                 
                 if (sampleBuffer.isFloat)
                 {
@@ -822,18 +822,6 @@
                 // assign source data
                 AudioBufferList *tempAudioBufferList = [sampleBuffer audioBufferListWithOptions:0];
                 
-                /*
-                 int totalDataSize = 0;
-                 
-                 for (int count = 0; count < tempAudioBufferList->mNumberBuffers; count++)
-                 {
-                 totalDataSize += tempAudioBufferList->mBuffers[count].mDataByteSize;
-                 }
-                 
-                 QTFFAppLog(@"QTKit total data size: %d", totalDataSize);
-                 QTFFAppLog(@"FFmpeg line size: %d", _sourceLineSize);
-                 */
-                
                 for (uint j = 0; j < _sourceNumberOfChannels; j++)
                 {
                     float *channelData = (float *)_sourceData[j];
@@ -844,18 +832,6 @@
                         channelData[i] = captureBuffer[i];
                     }
                 }
-                
-                //                 uint i = 0;
-                //                 QTFFAppLog(@"Is starting address channel 1 capture buffer: %p aligned? %@", &tempAudioBufferList->mBuffers[0].mData[i], (int)&tempAudioBufferList->mBuffers[0].mData[i] % 32 == 0 ? @"YES" : @"NO");
-                //                 QTFFAppLog(@"Is starting address channel 2 capture buffer: %p aligned? %@", &tempAudioBufferList->mBuffers[1].mData[i], (int)&tempAudioBufferList->mBuffers[1].mData[i] % 32 == 0 ? @"YES" : @"NO");
-                //                 QTFFAppLog(@"Is starting address ch12ata[%d]: %p aligned? %@", i, &ch2Data[i], (int)&ch2Data[i] % 32 == 0 ? @"YES" : @"NO");
-                //                 QTFFAppLog(@"Is starting address ch1Data[%d]: %p aligned? %@", i, &ch1Data[i], (int)&ch1Data[i] % 32 == 0 ? @"YES" : @"NO");
-                //                 QTFFAppLog(@"Is starting address ch12ata[%d]: %p aligned? %@", i, &ch2Data[i], (int)&ch2Data[i] % 32 == 0 ? @"YES" : @"NO");
-                //                 i = sourceNumberOfSamples;
-                //                 QTFFAppLog(@"Is ending address channel 1 capture buffer: %p aligned? %@", &tempAudioBufferList->mBuffers[0].mData[i], (int)&tempAudioBufferList->mBuffers[0].mData[i] % 32 == 0 ? @"YES" : @"NO");
-                //                 QTFFAppLog(@"Is ending address channel 2 capture buffer: %p aligned? %@", &tempAudioBufferList->mBuffers[1].mData[i], (int)&tempAudioBufferList->mBuffers[1].mData[i] % 32 == 0 ? @"YES" : @"NO");
-                //                 QTFFAppLog(@"Is ending address ch1Data[%d]: %p aligned? %@", i, &ch1Data[i], (int)&ch1Data[i] % 32 == 0 ? @"YES" : @"NO");
-                //                 QTFFAppLog(@"Is ending address ch12ata[%d]: %p aligned? %@", i, &ch2Data[i], (int)&ch2Data[i] % 32 == 0 ? @"YES" : @"NO");
                 
                 // convert to destination format
                 returnVal = swr_convert(_resamplerCtx,
@@ -878,38 +854,6 @@
                     return NO;
                 }
                 
-                /*
-                 int bufferSize = av_samples_get_buffer_size(&_sourceLineSize,
-                 _sourceNumberOfChannels,
-                 _sourceNumberOfSamples,
-                 _sourceSampleFormat,
-                 0);
-                 
-                 _streamAudioFrame->nb_samples = _sourceNumberOfSamples;
-                 _streamAudioFrame->format = _sourceSampleFormat;
-                 _streamAudioFrame->channel_layout = _sourceChannelLayout;
-                 _streamAudioFrame->channels = _sourceNumberOfChannels;
-                 _streamAudioFrame->sample_rate = _sourceSampleRate;
-                 */
-                
-                //                QTFFAppLog(@"Source number of channels: %d", sourceNumberOfChannels);
-                //                QTFFAppLog(@"Destination number of channels: %d", destinationNumberOfChannels);
-                //                QTFFAppLog(@"_streamAudioFrame->channels = %d", _streamAudioFrame->channels);
-                //                QTFFAppLog(@"Source channel layout: %lld", sourceChannelLayout);
-                //                QTFFAppLog(@"Destination channel layout: %lld", destinationChannelLayout);
-                //                QTFFAppLog(@"_streamAudioFrame->channel_layout = %lld", _streamAudioFrame->channel_layout);
-                //                QTFFAppLog(@"Source sample format: %d", sourceSampleFormat);
-                //                QTFFAppLog(@"Destination sample format: %d", destinationSampleFormat);
-                //                QTFFAppLog(@"_streamAudioFrame->format = %d", _streamAudioFrame->format);
-                //                QTFFAppLog(@"Source sample rate: %d", sourceSampleRate);
-                //                QTFFAppLog(@"Destination sample rate: %d", destinationSampleRate);
-                //                QTFFAppLog(@"_streamAudioFrame->sample_rate = %d", _streamAudioFrame->sample_rate);
-                //                QTFFAppLog(@"Source line size: %d", sourceLineSize);
-                //                QTFFAppLog(@"Destination line size: %d", destinationLineSize);
-                //                QTFFAppLog(@"Source number of samples: %d", sourceNumberOfSamples);
-                //                QTFFAppLog(@"Destination number of samples: %d", destinationNumberOfSamples);
-                //                QTFFAppLog(@"_streamAudioFrame->nb_samples = %d", _streamAudioFrame->nb_samples);
-                
                 // calcuate the pts from last pts to the current presentation time
                 
                 if (! _hasFirstSampleBufferAudioFrame)
@@ -923,9 +867,9 @@
                     _capturedAudioFramePts = [sampleBuffer FFmpegPTSWithStartingPresentationTime:_firstSampleBufferAudioFramePresentationTime timeBaseDen:codecCtx->time_base.den];
                 }
                 
-                QTFFAppLog(@"Captured audio frame pts: %lld", _capturedAudioFramePts);
-                long duration = [sampleBuffer FFmpegDurationWithTimeBaseDen:codecCtx->time_base.den];
-                QTFFAppLog(@"Captured audio frame duration: %ld", duration);
+                //QTFFAppLog(@"Captured audio frame pts: %lld", _capturedAudioFramePts);
+                //long duration = [sampleBuffer FFmpegDurationWithTimeBaseDen:codecCtx->time_base.den];
+                //QTFFAppLog(@"Captured audio frame duration: %ld", duration);
                 
                 int sampleIndex = 0;
                 int frameNumberOfSamples = 0;
@@ -988,9 +932,10 @@
                     _capturedAudioFramePts += sampleIndex;
                     _avPacket.pts = _capturedAudioFramePts;
                     _avPacket.dts = _avPacket.pts;
+                    _avPacket.duration = frameNumberOfSamples;
                     //_avPacket.duration = (double)duration * ((double)frameNumberOfSamples / (double)sampleBuffer.numberOfSamples);
                 
-                    QTFFAppLog(@"Pre-encoding audio pts: %lld", _avPacket.pts);
+                    //QTFFAppLog(@"Pre-encoding audio pts: %lld", _avPacket.pts);
                     //QTFFAppLog(@"Pre-encoding audio duration: %d", _avPacket.duration);
                     
                     // encode the audio
