@@ -427,6 +427,7 @@
                 {
                     //if (! _hasCodecCapDelay)
                     //{
+                    _capturedAudioFramePts += _avPacket.size;
                     _avPacket.pts = av_rescale_q(_capturedAudioFramePts, codecCtx->time_base, _audioStream->time_base);
                     _avPacket.dts = _avPacket.pts;
                     //}
@@ -1101,23 +1102,57 @@
                 long duration = [sampleBuffer FFmpegDurationWithTimeBaseDen:codecCtx->time_base.den];
                 //QTFFAppLog(@"Captured video frame duration: %ld", duration);
                 
-                for (int i = 0; i < duration; i++)
+                // encode the video frame, fill a packet for streaming
+                _avPacket.data = NULL;
+                _avPacket.size = 0;
+                int gotPacket;
+                
+                _avPacket.pts = _capturedVideoFramePts;
+                _avPacket.dts = _avPacket.pts;
+                _avPacket.duration = (int)duration;
+                
+                //QTFFAppLog(@"Pre-encoding video pts: %lld", _avPacket.pts);
+                //QTFFAppLog(@"Pre-encoding video duration: %d", _avPacket.duration);
+                
+                // encoding
+                returnVal = avcodec_encode_video2(codecCtx, &_avPacket, _outputVideoFrame, &gotPacket);
+                
+                if (returnVal != 0)
                 {
-                    // encode the video frame, fill a packet for streaming
-                    _avPacket.data = NULL;
-                    _avPacket.size = 0;
-                    int gotPacket;
+                    if (error)
+                    {
+                        *error = [NSError errorWithDomain:QTFFVideoErrorDomain
+                                                     code:QTFFErrorCode_VideoStreamingError
+                                              description:[NSString stringWithFormat:@"Unable to encode the video frame, error: %d", returnVal]];
+                    }
                     
-                    _capturedAudioFramePts += i;
-                    _avPacket.pts = _capturedVideoFramePts;
+                    return NO;
+                }
+                
+                // if a packet was returned, write it to the network stream. The codec may take several calls before returning a packet.
+                // only when there is a full packet returned for streaming should writing be attempted.
+                if (gotPacket == 1)
+                {
+                    if (codecCtx->coded_frame->pts != AV_NOPTS_VALUE)
+                    {
+                        //_avPacket.pts = av_rescale_q(codecCtx->coded_frame->pts, codecCtx->time_base, _videoStream->time_base);
+                        _avPacket.pts = av_rescale_q(_capturedVideoFramePts, codecCtx->time_base, _videoStream->time_base);
+                    }
+                    
                     _avPacket.dts = _avPacket.pts;
-                    _avPacket.duration = 1;
                     
-                    QTFFAppLog(@"Pre-encoding video pts: %lld", _avPacket.pts);
-                    QTFFAppLog(@"Pre-encoding video duration: %d", _avPacket.duration);
+                    if(codecCtx->coded_frame->key_frame)
+                    {
+                        _avPacket.flags |= AV_PKT_FLAG_KEY;
+                    }
                     
-                    // encoding
-                    returnVal = avcodec_encode_video2(codecCtx, &_avPacket, _outputVideoFrame, &gotPacket);
+                    _avPacket.stream_index= _videoStream->index;
+                    
+                    //QTFFAppLog(@"Pre-writing video pts: %lld", _avPacket.pts);
+                    
+                    // write the frame
+                    returnVal = av_interleaved_write_frame(_avOutputFormatContext, &_avPacket);
+                    //returnVal = av_write_frame(_avOutputFormatContext, &_avPacket);
                     
                     if (returnVal != 0)
                     {
@@ -1125,54 +1160,17 @@
                         {
                             *error = [NSError errorWithDomain:QTFFVideoErrorDomain
                                                          code:QTFFErrorCode_VideoStreamingError
-                                                  description:[NSString stringWithFormat:@"Unable to encode the video frame, error: %d", returnVal]];
-                        }
-                        
-                        return NO;
-                    }
-                    
-                    // if a packet was returned, write it to the network stream. The codec may take several calls before returning a packet.
-                    // only when there is a full packet returned for streaming should writing be attempted.
-                    if (gotPacket == 1)
-                    {
-                        if (codecCtx->coded_frame->pts != AV_NOPTS_VALUE)
-                        {
-                            _avPacket.pts = av_rescale_q(codecCtx->coded_frame->pts, codecCtx->time_base, _videoStream->time_base);
-                        }
-                        
-                        _avPacket.dts = _avPacket.pts;
-                        
-                        if(codecCtx->coded_frame->key_frame)
-                        {
-                            _avPacket.flags |= AV_PKT_FLAG_KEY;
-                        }
-                        
-                        _avPacket.stream_index= _videoStream->index;
-                        
-                        //QTFFAppLog(@"Pre-writing video pts: %lld", _avPacket.pts);
-                        
-                        // write the frame
-                        returnVal = av_interleaved_write_frame(_avOutputFormatContext, &_avPacket);
-                        //returnVal = av_write_frame(_avOutputFormatContext, &_avPacket);
-                        
-                        if (returnVal != 0)
-                        {
-                            if (error)
-                            {
-                                *error = [NSError errorWithDomain:QTFFVideoErrorDomain
-                                                             code:QTFFErrorCode_VideoStreamingError
-                                                      description:[NSString stringWithFormat:@"Unable to write the video frame to the stream, error: %d", returnVal]];
-                            }
-                            
-                            // release the packet
-                            av_free_packet(&_avPacket);
-                            
-                            return NO;
+                                                  description:[NSString stringWithFormat:@"Unable to write the video frame to the stream, error: %d", returnVal]];
                         }
                         
                         // release the packet
                         av_free_packet(&_avPacket);
+                        
+                        return NO;
                     }
+                    
+                    // release the packet
+                    av_free_packet(&_avPacket);
                 }
                 
                 return YES;
