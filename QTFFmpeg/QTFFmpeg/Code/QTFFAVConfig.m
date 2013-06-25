@@ -46,7 +46,8 @@
 #define AUDIO_CODEC_SAMPLE_FORMAT                               AV_SAMPLE_FMT_FLTP
 #define AUDIO_CODEC_BIT_RATE_PREFERRED_KBPS                     128
 #define AUDIO_CODEC_SAMPLE_RATE                                 44100
-#define AUDIO_CODEC_NUMBER_OF_CHANNELS                          2
+//#define AUDIO_CODEC_NUMBER_OF_CHANNELS                          2
+#define AUDIO_CODEC_NUMBER_OF_CHANNELS                          1
 
 
 static QTFFAVConfig *_sharedInstance;
