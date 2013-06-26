@@ -364,15 +364,15 @@
     // set codec settings
     audioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
     
-    //int bitRate = config.audioCodecBitRatePreferredKbps * 1000;
-    //audioCodecCtx->bit_rate = bitRate;
+    int bitRate = config.audioCodecBitRatePreferredKbps * 1000;
+    audioCodecCtx->bit_rate = bitRate;
     
     audioCodecCtx->sample_rate = config.audioCodecSampleRate;
     audioCodecCtx->channels = config.audioCodecNumberOfChannels;
     audioCodecCtx->channel_layout = av_get_default_channel_layout(config.audioCodecNumberOfChannels);
     audioCodecCtx->sample_fmt = config.audioCodecSampleFormat;
-    audioCodecCtx->time_base.num = 1;
-    audioCodecCtx->time_base.den = config.audioCodecSampleRate;
+    //audioCodecCtx->time_base.num = 1;
+    //audioCodecCtx->time_base.den = config.audioCodecSampleRate;
     
     if (avcodec_open2(audioCodecCtx, audioCodec, NULL) < 0)
     {
