@@ -650,8 +650,6 @@
                 // determine sample format
                 enum AVSampleFormat sourceSampleFormat;
                 
-                //[sampleBuffer logInfo];
-                
                 if (sampleBuffer.isFloat)
                 {
                     sourceSampleFormat = AV_SAMPLE_FMT_FLTP;
@@ -683,6 +681,9 @@
                     _sourceSampleFormat != sourceSampleFormat ||
                     _sourceNumberOfSamples != (int)(sampleBuffer.numberOfSamples))
                 {
+                    QTFFAppLog(@"*** Detected new audio sample buffer format:");
+                    [sampleBuffer logInfo];
+                    
                     // release existing resources
                     [self releaseAudioMemory];
                     
