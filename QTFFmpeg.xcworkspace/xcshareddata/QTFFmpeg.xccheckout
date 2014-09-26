@@ -2,35 +2,37 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>DE7D27DE-3E4E-4F96-ADCF-8F67A4E0FB1E</string>
 	<key>IDESourceControlProjectName</key>
 	<string>QTFFmpeg</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>CCBB3F06-A15A-49EB-8C32-07EC30CDFEE0</key>
+		<key>B5EE2EB52EFD8AF022E368913F872F7B87BA670C</key>
 		<string>ssh://github.com/BigHillSoftware/QTFFmpeg.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>QTFFmpeg.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>CCBB3F06-A15A-49EB-8C32-07EC30CDFEE0</key>
+		<key>B5EE2EB52EFD8AF022E368913F872F7B87BA670C</key>
 		<string>..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>ssh://github.com/BigHillSoftware/QTFFmpeg.git</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>CCBB3F06-A15A-49EB-8C32-07EC30CDFEE0</string>
+	<string>B5EE2EB52EFD8AF022E368913F872F7B87BA670C</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>CCBB3F06-A15A-49EB-8C32-07EC30CDFEE0</string>
+			<string>B5EE2EB52EFD8AF022E368913F872F7B87BA670C</string>
 			<key>IDESourceControlWCCName</key>
 			<string>QTFFmpeg</string>
 		</dict>

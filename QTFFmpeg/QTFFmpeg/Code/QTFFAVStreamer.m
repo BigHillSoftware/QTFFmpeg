@@ -168,7 +168,14 @@
                         
                         // create the options dictionary, add the appropriate headers
                         AVDictionary *options = NULL;
+                        //const char *key = [@"rtmp_conn" UTF8String];
+                        //const char *value = [[NSString stringWithFormat:@"S:publish N:0 Z: S:%@ S:append", config.streamOutputStreamName] UTF8String];
+                        //av_dict_set(&options, key, value, AV_DICT_MATCH_CASE);
                         
+                        //int av_dict_set(AVDictionary **pm, const char *key, const char *value, int flags);
+
+                        //NSString *streamName = [NSString stringWithFormat:@"%@/%@ rtmp_conn=S:publish rtmp_conn=N:0 rtmp_conn=Z rtmp_conn=S:%@ rtmp_conn=S:append", URI, _provisionedStream.streamName, _provisionedStream.filename];
+
                         const char *cStreamName = [config.streamOutputStreamName UTF8String];
                         
                         int returnVal = avio_open2(&_avOutputFormatContext->pb, cStreamName, AVIO_FLAG_READ_WRITE, nil, &options);
@@ -772,7 +779,8 @@
                         return NO;
                     }
                     
-                    _destinationNumberOfSamples = (int)av_rescale_rnd(swr_get_delay(_resamplerCtx, _sourceSampleRate) + _sourceNumberOfSamples, _destinationSampleRate, _sourceSampleRate, AV_ROUND_UP);
+//                    _destinationNumberOfSamples = (int)av_rescale_rnd(swr_get_delay(_resamplerCtx, _sourceSampleRate) + _sourceNumberOfSamples, _destinationSampleRate, _sourceSampleRate, AV_ROUND_UP);
+                    _destinationNumberOfSamples = (int)av_rescale_rnd(swr_get_delay(_resamplerCtx, _sourceSampleRate) + _sourceNumberOfSamples, _destinationSampleRate, _sourceSampleRate, AV_ROUND_DOWN);
                     //QTFFAppLog(@"Calculated destination samples: %d, codec destination samples: %d", _destinationNumberOfSamples, codecCtx->frame_size);
                     
                     // allocate the destination samples buffer

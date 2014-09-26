@@ -8,9 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		421C206C17025D2000AEF12D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 426CA04E16F24F1F0070B627 /* MainMenu.xib */; };
-		4227CCDB1702551C00E1D2B3 /* libz.1.2.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE6316F26B9F001BB823 /* libz.1.2.5.dylib */; };
 		4227CCDC1702552000E1D2B3 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE6116F26B89001BB823 /* libz.dylib */; };
-		4227CCDD1702552300E1D2B3 /* libbz2.1.0.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE5F16F26B73001BB823 /* libbz2.1.0.5.dylib */; };
 		4227CCDF1702552F00E1D2B3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42A5841216F9007400E1AF5A /* CoreGraphics.framework */; };
 		4227CCE01702553200E1D2B3 /* VideoDecodeAcceleration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE6716F26BDB001BB823 /* VideoDecodeAcceleration.framework */; };
 		4227CCE11702553600E1D2B3 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E2DE6516F26BC0001BB823 /* QuartzCore.framework */; };
@@ -26,6 +24,11 @@
 		4227CCEC170255EB00E1D2B3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 426CA03E16F24F1E0070B627 /* Foundation.framework */; };
 		4227CCED170255EE00E1D2B3 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 426CA03D16F24F1E0070B627 /* CoreData.framework */; };
 		4227CCEE170255F400E1D2B3 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 426CA03C16F24F1E0070B627 /* AppKit.framework */; };
+		42367E4719D49A9300F90682 /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 42367E4619D49A9300F90682 /* libssl.dylib */; };
+		42367E4919D49ADE00F90682 /* libavresample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42367E4819D49ADE00F90682 /* libavresample.a */; };
+		42367E4B19D4D4F000F90682 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 42367E4A19D4D4F000F90682 /* libcrypto.dylib */; };
+		42367E4D19D4DC2900F90682 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 42367E4C19D4DC2900F90682 /* libbz2.dylib */; };
+		42367E4F19D4DC6700F90682 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 42367E4E19D4DC6700F90682 /* libiconv.dylib */; };
 		42459948172CD9FA0043E3BF /* libmp3lame.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42459947172CD9FA0043E3BF /* libmp3lame.a */; };
 		424D5BB3170201D800571C75 /* QTSampleBuffer+Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 424D5BB2170201D800571C75 /* QTSampleBuffer+Utils.m */; };
 		4257386016F8F7CD00CEE303 /* QTFFAVConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4257385F16F8F7CD00CEE303 /* QTFFAVConfig.m */; };
@@ -37,7 +40,6 @@
 		426CA06416F24F1F0070B627 /* QTFFmpegTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 426CA06316F24F1F0070B627 /* QTFFmpegTests.m */; };
 		427275E116F2851F003DCA16 /* QTFFAVViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 427275E016F2851F003DCA16 /* QTFFAVViewController.m */; };
 		427275E416F28798003DCA16 /* QTFFAVCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 427275E316F28798003DCA16 /* QTFFAVCapture.m */; };
-		427877A01720F4B700083B59 /* libiconv.2.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4278779F1720F4B700083B59 /* libiconv.2.4.0.dylib */; };
 		429AFE17170256C000C17D6B /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 429AFE16170256C000C17D6B /* ApplicationServices.framework */; };
 		42A5840B16F8FD1E00E1AF5A /* NSView+BackgroundColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 42A5840A16F8FD1E00E1AF5A /* NSView+BackgroundColor.m */; };
 		42A5840E16F8FD8F00E1AF5A /* NSColor+Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 42A5840D16F8FD8F00E1AF5A /* NSColor+Utils.m */; };
@@ -60,6 +62,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		42367E4619D49A9300F90682 /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = usr/lib/libssl.dylib; sourceTree = SDKROOT; };
+		42367E4819D49ADE00F90682 /* libavresample.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavresample.a; path = ../FFmpeg/libs/MacOSX/x86_64/lib/libavresample.a; sourceTree = "<group>"; };
+		42367E4A19D4D4F000F90682 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
+		42367E4C19D4DC2900F90682 /* libbz2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbz2.dylib; path = usr/lib/libbz2.dylib; sourceTree = SDKROOT; };
+		42367E4E19D4DC6700F90682 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = usr/lib/libiconv.dylib; sourceTree = SDKROOT; };
 		42459947172CD9FA0043E3BF /* libmp3lame.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmp3lame.a; path = ../libmp3lame/libmp3lame.a; sourceTree = "<group>"; };
 		424D5BB1170201D800571C75 /* QTSampleBuffer+Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "QTSampleBuffer+Utils.h"; sourceTree = "<group>"; };
 		424D5BB2170201D800571C75 /* QTSampleBuffer+Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "QTSampleBuffer+Utils.m"; sourceTree = "<group>"; };
@@ -88,7 +95,6 @@
 		427275E016F2851F003DCA16 /* QTFFAVViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QTFFAVViewController.m; sourceTree = "<group>"; };
 		427275E216F28798003DCA16 /* QTFFAVCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QTFFAVCapture.h; sourceTree = "<group>"; };
 		427275E316F28798003DCA16 /* QTFFAVCapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QTFFAVCapture.m; sourceTree = "<group>"; };
-		4278779F1720F4B700083B59 /* libiconv.2.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.2.4.0.dylib; path = usr/lib/libiconv.2.4.0.dylib; sourceTree = SDKROOT; };
 		429AFE16170256C000C17D6B /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
 		42A5840916F8FD1E00E1AF5A /* NSView+BackgroundColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSView+BackgroundColor.h"; sourceTree = "<group>"; };
 		42A5840A16F8FD1E00E1AF5A /* NSView+BackgroundColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSView+BackgroundColor.m"; sourceTree = "<group>"; };
@@ -116,9 +122,7 @@
 		42E2DE5A16F268B9001BB823 /* QTFFAppLogFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QTFFAppLogFile.m; sourceTree = "<group>"; };
 		42E2DE5C16F26944001BB823 /* NSDate+Format.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Format.h"; sourceTree = "<group>"; };
 		42E2DE5D16F26944001BB823 /* NSDate+Format.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Format.m"; sourceTree = "<group>"; };
-		42E2DE5F16F26B73001BB823 /* libbz2.1.0.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbz2.1.0.5.dylib; path = usr/lib/libbz2.1.0.5.dylib; sourceTree = SDKROOT; };
 		42E2DE6116F26B89001BB823 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		42E2DE6316F26B9F001BB823 /* libz.1.2.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.5.dylib; path = usr/lib/libz.1.2.5.dylib; sourceTree = SDKROOT; };
 		42E2DE6516F26BC0001BB823 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		42E2DE6716F26BDB001BB823 /* VideoDecodeAcceleration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoDecodeAcceleration.framework; path = System/Library/Frameworks/VideoDecodeAcceleration.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -128,18 +132,20 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				42459948172CD9FA0043E3BF /* libmp3lame.a in Frameworks */,
-				427877A01720F4B700083B59 /* libiconv.2.4.0.dylib in Frameworks */,
-				4227CCEB1702557E00E1D2B3 /* libswscale.a in Frameworks */,
-				4227CCEA1702557A00E1D2B3 /* libswresample.a in Frameworks */,
-				4227CCE91702557700E1D2B3 /* libavutil.a in Frameworks */,
-				4227CCE81702557200E1D2B3 /* libavformat.a in Frameworks */,
-				4227CCE71702556F00E1D2B3 /* libavfilter.a in Frameworks */,
-				4227CCE61702556B00E1D2B3 /* libavdevice.a in Frameworks */,
-				4227CCE51702556800E1D2B3 /* libavcodec.a in Frameworks */,
-				4227CCDD1702552300E1D2B3 /* libbz2.1.0.5.dylib in Frameworks */,
-				4227CCDB1702551C00E1D2B3 /* libz.1.2.5.dylib in Frameworks */,
+				42367E4F19D4DC6700F90682 /* libiconv.dylib in Frameworks */,
+				42367E4D19D4DC2900F90682 /* libbz2.dylib in Frameworks */,
+				42367E4B19D4D4F000F90682 /* libcrypto.dylib in Frameworks */,
+				42367E4719D49A9300F90682 /* libssl.dylib in Frameworks */,
 				4227CCDC1702552000E1D2B3 /* libz.dylib in Frameworks */,
+				42367E4919D49ADE00F90682 /* libavresample.a in Frameworks */,
+				4227CCE51702556800E1D2B3 /* libavcodec.a in Frameworks */,
+				4227CCE61702556B00E1D2B3 /* libavdevice.a in Frameworks */,
+				4227CCE71702556F00E1D2B3 /* libavfilter.a in Frameworks */,
+				4227CCE81702557200E1D2B3 /* libavformat.a in Frameworks */,
+				4227CCE91702557700E1D2B3 /* libavutil.a in Frameworks */,
+				4227CCEA1702557A00E1D2B3 /* libswresample.a in Frameworks */,
+				4227CCEB1702557E00E1D2B3 /* libswscale.a in Frameworks */,
+				42459948172CD9FA0043E3BF /* libmp3lame.a in Frameworks */,
 				429AFE17170256C000C17D6B /* ApplicationServices.framework in Frameworks */,
 				4227CCE31702553C00E1D2B3 /* Cocoa.framework in Frameworks */,
 				4227CCE21702553800E1D2B3 /* QTKit.framework in Frameworks */,
@@ -187,10 +193,11 @@
 		426CA03816F24F1E0070B627 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				4278779F1720F4B700083B59 /* libiconv.2.4.0.dylib */,
-				42E2DE6316F26B9F001BB823 /* libz.1.2.5.dylib */,
+				42367E4E19D4DC6700F90682 /* libiconv.dylib */,
+				42367E4C19D4DC2900F90682 /* libbz2.dylib */,
+				42367E4A19D4D4F000F90682 /* libcrypto.dylib */,
+				42367E4619D49A9300F90682 /* libssl.dylib */,
 				42E2DE6116F26B89001BB823 /* libz.dylib */,
-				42E2DE5F16F26B73001BB823 /* libbz2.1.0.5.dylib */,
 				429AFE16170256C000C17D6B /* ApplicationServices.framework */,
 				42A5841216F9007400E1AF5A /* CoreGraphics.framework */,
 				42E2DE6716F26BDB001BB823 /* VideoDecodeAcceleration.framework */,
@@ -286,6 +293,7 @@
 		42E2DE4F16F264CB001BB823 /* FFmpeg libs */ = {
 			isa = PBXGroup;
 			children = (
+				42367E4819D49ADE00F90682 /* libavresample.a */,
 				42459947172CD9FA0043E3BF /* libmp3lame.a */,
 				42E2DE4116F264A8001BB823 /* libavcodec.a */,
 				42E2DE4216F264A8001BB823 /* libavdevice.a */,
@@ -372,7 +380,7 @@
 			name = QTFFmpegTests;
 			productName = QTFFmpegTests;
 			productReference = 426CA05616F24F1F0070B627 /* QTFFmpegTests.octest */;
-			productType = "com.apple.product-type.bundle";
+			productType = "com.apple.product-type.bundle.ocunit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -381,7 +389,8 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = QTFF;
-				LastUpgradeCheck = 0460;
+				LastTestingUpgradeCheck = 0610;
+				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Big Hill Software LLC";
 			};
 			buildConfigurationList = 426CA03116F24F1E0070B627 /* Build configuration list for PBXProject "QTFFmpeg" */;
@@ -518,7 +527,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -542,11 +550,15 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "../FFmpeg/libs/MacOSX/x86_64/include/**";
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../FFmpeg/libs/MacOSX/x86_64/lib\"";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				LIBRARY_SEARCH_PATHS = (
+					"../FFmpeg/libs/MacOSX/x86_64/lib/**",
+					../libmp3lame,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
+				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
 		};
@@ -554,7 +566,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -572,17 +583,20 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "../FFmpeg/libs/MacOSX/x86_64/include/**";
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../FFmpeg/libs/MacOSX/x86_64/lib\"";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				LIBRARY_SEARCH_PATHS = (
+					"../FFmpeg/libs/MacOSX/x86_64/lib/**",
+					../libmp3lame,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
+				VALID_ARCHS = x86_64;
 			};
 			name = Release;
 		};
 		426CA06816F24F1F0070B627 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -592,15 +606,15 @@
 				GCC_PREFIX_HEADER = "QTFFmpeg/QTFFmpeg-Prefix.pch";
 				INFOPLIST_FILE = "QTFFmpeg/QTFFmpeg-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../FFmpeg/libs/MacOSX/x86_64/lib\"",
-					"\"$(SRCROOT)/../../../FFmpeg/ffmpeg/libavdevice\"",
-					"\"$(SRCROOT)/../../../FFmpeg/ffmpeg/libavfilter\"",
-					"\"$(SRCROOT)/../libmp3lame\"",
+					"../FFmpeg/libs/MacOSX/x86_64/lib/**",
+					../libmp3lame,
+					"/Users/brado/brado/Work/Development/BHS-Work/BHS-OSS/QTFFmpeg/FFmpeg/libs/MacOSX/x86_64/lib",
+					"/Users/brado/brado/Work/Development/BHS-Work/BHS-OSS/QTFFmpeg/libmp3lame",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = YES;
+				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -608,7 +622,6 @@
 		426CA06916F24F1F0070B627 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -618,15 +631,15 @@
 				GCC_PREFIX_HEADER = "QTFFmpeg/QTFFmpeg-Prefix.pch";
 				INFOPLIST_FILE = "QTFFmpeg/QTFFmpeg-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../FFmpeg/libs/MacOSX/x86_64/lib\"",
-					"\"$(SRCROOT)/../../../FFmpeg/ffmpeg/libavdevice\"",
-					"\"$(SRCROOT)/../../../FFmpeg/ffmpeg/libavfilter\"",
-					"\"$(SRCROOT)/../libmp3lame\"",
+					"../FFmpeg/libs/MacOSX/x86_64/lib/**",
+					../libmp3lame,
+					"/Users/brado/brado/Work/Development/BHS-Work/BHS-OSS/QTFFmpeg/FFmpeg/libs/MacOSX/x86_64/lib",
+					"/Users/brado/brado/Work/Development/BHS-Work/BHS-OSS/QTFFmpeg/libmp3lame",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = YES;
+				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
