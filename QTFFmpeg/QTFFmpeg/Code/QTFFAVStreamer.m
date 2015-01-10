@@ -398,8 +398,8 @@
     _hasAudioCodecCapDelay = audioCodecCtx->codec->capabilities & CODEC_CAP_DELAY;
     
     // initialize the output audio frame
-    _streamAudioFrame = avcodec_alloc_frame();
-    
+    //_streamAudioFrame = avcodec_alloc_frame();
+    _streamAudioFrame = av_frame_alloc();
     return YES;
 }
 
@@ -1132,7 +1132,7 @@
                     return NO;
                 }
                 
-                // if a packet was returned, write it to the network stream. The codec may take several calls before returning a packet.
+                // if a packet was returned, write it to the stream. The codec may take several calls before returning a packet.
                 // only when there is a full packet returned for streaming should writing be attempted.
                 if (gotPacket == 1)
                 {
@@ -1202,7 +1202,7 @@
     uint8_t *frameBuffer;
     int size;
     
-    frame = avcodec_alloc_frame();
+    frame = av_frame_alloc();
     
     if (frame)
     {

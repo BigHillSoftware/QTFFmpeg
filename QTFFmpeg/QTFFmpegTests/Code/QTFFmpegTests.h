@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 Big Hill Software LLC. All rights reserved.
 //
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 
-@interface QTFFmpegTests : SenTestCase
+@interface QTFFmpegTests : XCTestCase
 
 @end

@@ -34,7 +34,6 @@
 		4257386016F8F7CD00CEE303 /* QTFFAVConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4257385F16F8F7CD00CEE303 /* QTFFAVConfig.m */; };
 		426CA04616F24F1E0070B627 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 426CA04516F24F1E0070B627 /* main.m */; };
 		426CA04D16F24F1E0070B627 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 426CA04C16F24F1E0070B627 /* AppDelegate.m */; };
-		426CA05816F24F1F0070B627 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 426CA05716F24F1F0070B627 /* SenTestingKit.framework */; };
 		426CA05916F24F1F0070B627 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 426CA03916F24F1E0070B627 /* Cocoa.framework */; };
 		426CA06116F24F1F0070B627 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 426CA05F16F24F1F0070B627 /* InfoPlist.strings */; };
 		426CA06416F24F1F0070B627 /* QTFFmpegTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 426CA06316F24F1F0070B627 /* QTFFmpegTests.m */; };
@@ -85,8 +84,7 @@
 		426CA04B16F24F1E0070B627 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		426CA04C16F24F1E0070B627 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		426CA04F16F24F1F0070B627 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		426CA05616F24F1F0070B627 /* QTFFmpegTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QTFFmpegTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
-		426CA05716F24F1F0070B627 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		426CA05616F24F1F0070B627 /* QTFFmpegTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QTFFmpegTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		426CA05E16F24F1F0070B627 /* QTFFmpegTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "QTFFmpegTests-Info.plist"; sourceTree = "<group>"; };
 		426CA06016F24F1F0070B627 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		426CA06216F24F1F0070B627 /* QTFFmpegTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QTFFmpegTests.h; sourceTree = "<group>"; };
@@ -162,7 +160,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				426CA05816F24F1F0070B627 /* SenTestingKit.framework in Frameworks */,
 				426CA05916F24F1F0070B627 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -185,7 +182,7 @@
 			isa = PBXGroup;
 			children = (
 				426CA03616F24F1E0070B627 /* QTFFmpeg.app */,
-				426CA05616F24F1F0070B627 /* QTFFmpegTests.octest */,
+				426CA05616F24F1F0070B627 /* QTFFmpegTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -204,7 +201,6 @@
 				42E2DE6516F26BC0001BB823 /* QuartzCore.framework */,
 				42E2DE3F16F26485001BB823 /* QTKit.framework */,
 				426CA03916F24F1E0070B627 /* Cocoa.framework */,
-				426CA05716F24F1F0070B627 /* SenTestingKit.framework */,
 				426CA03B16F24F1E0070B627 /* Other Frameworks */,
 			);
 			name = Frameworks;
@@ -379,8 +375,8 @@
 			);
 			name = QTFFmpegTests;
 			productName = QTFFmpegTests;
-			productReference = 426CA05616F24F1F0070B627 /* QTFFmpegTests.octest */;
-			productType = "com.apple.product-type.bundle.ocunit-test";
+			productReference = 426CA05616F24F1F0070B627 /* QTFFmpegTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -526,7 +522,7 @@
 		426CA06516F24F1F0070B627 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -552,7 +548,7 @@
 				HEADER_SEARCH_PATHS = "../FFmpeg/libs/MacOSX/x86_64/include/**";
 				LIBRARY_SEARCH_PATHS = (
 					"../FFmpeg/libs/MacOSX/x86_64/lib/**",
-					../libmp3lame,
+					"../libmp3lame/**",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
@@ -565,7 +561,7 @@
 		426CA06616F24F1F0070B627 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -585,7 +581,7 @@
 				HEADER_SEARCH_PATHS = "../FFmpeg/libs/MacOSX/x86_64/include/**";
 				LIBRARY_SEARCH_PATHS = (
 					"../FFmpeg/libs/MacOSX/x86_64/lib/**",
-					../libmp3lame,
+					"../libmp3lame/**",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				RUN_CLANG_STATIC_ANALYZER = YES;
@@ -607,9 +603,7 @@
 				INFOPLIST_FILE = "QTFFmpeg/QTFFmpeg-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"../FFmpeg/libs/MacOSX/x86_64/lib/**",
-					../libmp3lame,
-					"/Users/brado/brado/Work/Development/BHS-Work/BHS-OSS/QTFFmpeg/FFmpeg/libs/MacOSX/x86_64/lib",
-					"/Users/brado/brado/Work/Development/BHS-Work/BHS-OSS/QTFFmpeg/libmp3lame",
+					"../libmp3lame/**",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -632,9 +626,7 @@
 				INFOPLIST_FILE = "QTFFmpeg/QTFFmpeg-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"../FFmpeg/libs/MacOSX/x86_64/lib/**",
-					../libmp3lame,
-					"/Users/brado/brado/Work/Development/BHS-Work/BHS-OSS/QTFFmpeg/FFmpeg/libs/MacOSX/x86_64/lib",
-					"/Users/brado/brado/Work/Development/BHS-Work/BHS-OSS/QTFFmpeg/libmp3lame",
+					"../libmp3lame/**",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -649,13 +641,15 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/QTFFmpeg.app/Contents/MacOS/QTFFmpeg";
 				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = "\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"";
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+					"$(inherited)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "QTFFmpeg/QTFFmpeg-Prefix.pch";
 				INFOPLIST_FILE = "QTFFmpegTests/QTFFmpegTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = octest;
 			};
 			name = Debug;
 		};
@@ -664,13 +658,15 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/QTFFmpeg.app/Contents/MacOS/QTFFmpeg";
 				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = "\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"";
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+					"$(inherited)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "QTFFmpeg/QTFFmpeg-Prefix.pch";
 				INFOPLIST_FILE = "QTFFmpegTests/QTFFmpegTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = octest;
 			};
 			name = Release;
 		};
