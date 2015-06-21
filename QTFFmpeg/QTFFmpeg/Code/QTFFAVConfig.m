@@ -26,7 +26,9 @@
 //#define STREAM_OUTPUT_STREAM_TYPE                               QTFFStreamTypeFile
 //#define STREAM_OUTPUT_STREAM_NAME                               @"Output.flv"
 #define STREAM_OUTPUT_STREAM_TYPE                               QTFFStreamTypeNetwork
-#define STREAM_OUTPUT_STREAM_NAME                               @"rtmp://localhost:8086/live/Output.flv"
+//#define STREAM_OUTPUT_STREAM_NAME                               @"rtmp://54.183.225.22:1935/live/myStream"
+#define STREAM_OUTPUT_STREAM_NAME                               @"rtmps://devwowza.onlineproctoring.com/live/DevStream_5/DevTestVideo"
+//#define STREAM_OUTPUT_STREAM_NAME                               @"rtmp://localhost:8086/live/Output.flv"
 #define STREAM_OUTPUT_FILENAME_EXTENSION                        @"flv"
 #define STREAM_OUTPUT_MIME_TYPE                                 @"video/x-flv"
 
